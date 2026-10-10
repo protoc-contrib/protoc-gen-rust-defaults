@@ -3,7 +3,7 @@ members = ["protoc_contrib", "tests/fixture"]
 
 [package]
 name = "protoc-gen-rust-defaults"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "MIT"
 description = "protoc plugin that emits set_defaults() methods for buffa messages from protoc_contrib.defaults annotations."
