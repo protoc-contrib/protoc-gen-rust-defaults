@@ -23,9 +23,9 @@ use buffa_codegen::{
     },
 };
 
-use crate::annotations::protoc_contrib::defaults::{ONEOF, SKIP, UNEXPORTED, VALUE};
 use crate::check::{self, Value};
 use crate::presence::Scope;
+use protoc_contrib_defaults::{ONEOF, SKIP, UNEXPORTED, VALUE};
 
 /// A message that gets a generated method.
 #[derive(Debug)]
@@ -456,9 +456,7 @@ fn real_oneof(field: &FieldDescriptorProto) -> Option<i32> {
     field.oneof_index
 }
 
-fn field_defaults(
-    field: &FieldDescriptorProto,
-) -> Option<crate::annotations::protoc_contrib::defaults::FieldDefaults> {
+fn field_defaults(field: &FieldDescriptorProto) -> Option<protoc_contrib_defaults::FieldDefaults> {
     field
         .options
         .as_option()
@@ -528,12 +526,12 @@ fn name(name: Option<&str>) -> &str {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::annotations::protoc_contrib::defaults::{
-        FieldDefaults, MessageDefaults, field_defaults::Type as Default,
-    };
     use buffa_codegen::generated::descriptor::{
         EnumValueDescriptorProto, FieldOptions, FileDescriptorProto, MessageOptions,
         OneofDescriptorProto, OneofOptions, field_descriptor_proto::Label,
+    };
+    use protoc_contrib_defaults::{
+        FieldDefaults, MessageDefaults, field_defaults::Type as Default,
     };
 
     fn field(name: &str, kind: Type, default: Option<Default>) -> FieldDescriptorProto {

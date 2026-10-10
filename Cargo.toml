@@ -1,5 +1,5 @@
 [workspace]
-members = ["tests/fixture"]
+members = ["protoc_contrib/defaults", "tests/fixture"]
 
 [package]
 name = "protoc-gen-rust-defaults"
@@ -9,12 +9,10 @@ license = "MIT"
 description = "protoc plugin that emits set_defaults() methods for buffa messages from protoc_contrib.defaults annotations."
 repository = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
 homepage = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
-keywords = ["protobuf", "buffa", "defaults", "grpc", "codegen"]
-categories = ["development-tools"]
-# What `cargo install` builds from: the plugin, its build script and the
-# options proto that script compiles. The fixture, its test schema, CI and Nix
-# are this repository's, not the crate's.
-include = ["src/**", "build.rs", "proto/**", "README.md", "LICENSE", "CHANGELOG.md"]
+# Installed from GitHub -- the flake, the release binaries or `cargo install
+# --git` -- rather than crates.io: it reads the options through the
+# protoc_contrib/defaults crate beside their proto, which is GitHub-only too.
+publish = false
 
 [[bin]]
 name = "protoc-gen-rust-defaults"
@@ -29,6 +27,10 @@ all = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -1 }
 
 [dependencies]
+# The protoc_contrib.defaults options, compiled for buffa: the same types a
+# consumer reads them with, so the plugin and its users cannot disagree on
+# what an annotation says.
+protoc-contrib-defaults = { path = "protoc_contrib/defaults" }
 # The descriptor and plugin-protocol types, and the type-path resolution the
 # generated code has to agree with. Pinned to the same minor as the buffa
 # codegen whose output this extends -- an enum or oneof named by a different
@@ -43,6 +45,3 @@ anyhow = "1"
 # Timestamp literals are parsed at generation time, so a malformed one fails
 # `buf generate` rather than compiling to a panic.
 chrono = { version = "0.4", default-features = false, features = ["alloc"] }
-
-[build-dependencies]
-buffa-build = "0.9.2"

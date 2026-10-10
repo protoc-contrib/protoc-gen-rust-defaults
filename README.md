@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/protoc-contrib/protoc-gen-rust-defaults/actions/workflows/ci.yml/badge.svg)](https://github.com/protoc-contrib/protoc-gen-rust-defaults/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/protoc-contrib/protoc-gen-rust-defaults?include_prereleases)](https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases)
-[![crates.io](https://img.shields.io/crates/v/protoc-gen-rust-defaults?logo=rust)](https://crates.io/crates/protoc-gen-rust-defaults)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Rust (edition 2024)](https://img.shields.io/badge/Rust-2024-black?logo=rust)](https://www.rust-lang.org/)
 [![Nix Flake](https://img.shields.io/badge/Nix-Flake-5277C3?logo=nixos&logoColor=white)](https://nixos.wiki/wiki/Flakes)
@@ -162,15 +161,14 @@ nothing, and the whole method is yours. Either way, write it as an
 
 ## Wiring it up
 
-Install it from crates.io, or take `packages.default` from this repository's
-flake:
+It isn't on crates.io. Take `packages.default` from this repository's flake
+(see [Nix](#nix)), download a binary from the
+[releases](https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases),
+or build it from GitHub:
 
 ```sh
-cargo install protoc-gen-rust-defaults
+cargo install --git https://github.com/protoc-contrib/protoc-gen-rust-defaults protoc-gen-rust-defaults
 ```
-
-The build compiles the vendored options proto, so it needs `protoc`, either on
-`PATH` or named by `PROTOC`.
 
 The annotations come from protoc-gen-go-defaults' BSR module, so the schema
 depends on it there:
@@ -232,30 +230,27 @@ position in buffa's tree.
 
 Rust has no reflection that generic code could use to reach a message's
 defaults, which Go's `defaults.Apply` does. If you want an interceptor that
-defaults whatever request it's handed, define a one-method trait in your own
-crate and point the plugin at it:
-
-```rust
-pub trait SetDefaults {
-    fn set_defaults(&mut self);
-}
-```
+defaults whatever request it's handed, point the plugin at a trait with a
+`fn set_defaults(&mut self)`. The [`protoc-contrib-defaults`
+crate](#the-protoc-contrib-defaults-crate) has one:
 
 ```yaml
     opt:
-      - impl_trait=crate::SetDefaults
+      - impl_trait=::protoc_contrib_defaults::SetDefaults
 ```
 
 Every generated `set_defaults` then also gets an impl of that trait,
 delegating to the inherent method:
 
 ```rust
-impl crate::SetDefaults for ListBooksRequest {
+impl ::protoc_contrib_defaults::SetDefaults for ListBooksRequest {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
 }
 ```
+
+Any trait of the same shape works, so you can define your own instead.
 
 An `unexported` message gets no impl, since its method is yours and so is its
 impl. Without `impl_trait`, the output is inherent methods only. That's enough
@@ -274,6 +269,28 @@ plugin names is then named where buffa put it:
 
 Well-known types need none. They resolve to `buffa-types` here, the same as
 in buffa.
+
+### The `protoc-contrib-defaults` crate
+
+`protoc_contrib/defaults` holds the Rust side of the
+`protoc_contrib.defaults` package, beside its `options.proto`. It's the
+counterpart of protoc-gen-go-defaults' `protoc_contrib/defaults` Go package,
+and it has two parts:
+
+- **The options compiled for buffa:** `FieldDefaults`, `MessageDefaults`, and
+  the `VALUE`, `ONEOF`, `SKIP` and `UNEXPORTED` extensions, for reading the
+  annotations off a descriptor. The plugin reads them through these too. The
+  generated code is committed, so depending on the crate needs no `protoc`.
+- **`SetDefaults`:** the trait for `impl_trait`, with an impl for `Box<T>`.
+
+The generated code doesn't need the crate unless you use `impl_trait` with
+its trait. It isn't on crates.io either, so take it from GitHub, pinned to the
+release tag of the plugin that generated your code:
+
+```toml
+[dependencies]
+protoc-contrib-defaults = { git = "https://github.com/protoc-contrib/protoc-gen-rust-defaults", tag = "vX.Y.Z" }
+```
 
 ### Nix
 
@@ -306,6 +323,15 @@ code, so a change to its shape shows up in review. Regenerate it with:
 
 ```bash
 UPDATE_GOLDEN=1 cargo test -p defaults-fixture --test golden
+```
+
+`protoc_contrib/defaults/src/generated` is buffa's output for
+`protoc_contrib/defaults/options.proto`, and a test fails if it drifts from a
+fresh generation. After changing the proto or the buffa version, regenerate it
+with:
+
+```bash
+UPDATE_GENERATED=1 cargo test -p protoc-contrib-defaults --test generated
 ```
 
 ## License

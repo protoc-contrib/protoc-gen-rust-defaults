@@ -5,9 +5,11 @@
 //! exercised by the tests beside it, which is the only way to catch output
 //! that is well-formed Rust but wrong.
 //!
-//! Hand-written here: the mount points, the trait the generated code
-//! implements, and the `set_defaults` methods the schema's `skip` and
-//! `unexported` messages ask for in place of generated ones.
+//! Hand-written here: the mount points, and the `set_defaults` methods the
+//! schema's `skip` and `unexported` messages ask for in place of generated
+//! ones.
+
+use protoc_contrib_defaults::SetDefaults;
 
 /// The buffa-generated message types.
 pub mod proto {
@@ -22,7 +24,8 @@ pub mod proto {
 }
 
 /// The `set_defaults` methods this plugin emits for that schema, in a module
-/// tree of their own (`packaging=true`), each with an impl of [`SetDefaults`].
+/// tree of their own (`packaging=true`), each with an impl of
+/// [`SetDefaults`].
 pub mod defaults {
     include!(concat!(env!("OUT_DIR"), "/tree/defaults/mod.rs"));
 }
@@ -45,12 +48,6 @@ pub mod inline {
             "/inline/defaults/inline.v1.defaults.rs"
         ));
     }
-}
-
-/// The trait the main schema's messages implement (`impl_trait`): a
-/// consumer's own, for coding against messages generically.
-pub trait SetDefaults {
-    fn set_defaults(&mut self);
 }
 
 /// `unexported`: the generated `apply_defaults`, plus a slug no annotation can

@@ -30,7 +30,7 @@ impl Legacy {
         }
     }
 }
-impl crate::SetDefaults for Legacy {
+impl ::protoc_contrib_defaults::SetDefaults for Legacy {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -60,7 +60,7 @@ impl Edition {
         }
     }
 }
-impl crate::SetDefaults for Edition {
+impl ::protoc_contrib_defaults::SetDefaults for Edition {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -81,7 +81,7 @@ impl Outer {
         self.plain.get_or_insert_default();
     }
 }
-impl crate::SetDefaults for Outer {
+impl ::protoc_contrib_defaults::SetDefaults for Outer {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -102,7 +102,7 @@ impl outer::Inner {
         }
     }
 }
-impl crate::SetDefaults for outer::Inner {
+impl ::protoc_contrib_defaults::SetDefaults for outer::Inner {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -118,7 +118,7 @@ impl Type {
         }
     }
 }
-impl crate::SetDefaults for Type {
+impl ::protoc_contrib_defaults::SetDefaults for Type {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -203,7 +203,7 @@ impl Envelope {
         }
     }
 }
-impl crate::SetDefaults for Envelope {
+impl ::protoc_contrib_defaults::SetDefaults for Envelope {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }

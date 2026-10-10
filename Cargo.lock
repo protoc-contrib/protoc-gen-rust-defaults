@@ -126,6 +126,7 @@ dependencies = [
  "buffa-codegen",
  "buffa-descriptor",
  "buffa-types",
+ "protoc-contrib-defaults",
  "protoc-gen-rust-defaults",
 ]
 
@@ -329,16 +330,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "protoc-contrib-defaults"
+version = "0.1.0"
+dependencies = [
+ "buffa",
+ "buffa-build",
+]
+
+[[package]]
 name = "protoc-gen-rust-defaults"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "buffa",
- "buffa-build",
  "buffa-codegen",
  "chrono",
  "prettyplease 0.3.0",
  "proc-macro2",
+ "protoc-contrib-defaults",
  "quote",
  "syn 3.0.7",
 ]

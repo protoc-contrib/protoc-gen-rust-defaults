@@ -123,7 +123,7 @@ impl Types {
         }
     }
 }
-impl crate::SetDefaults for Types {
+impl ::protoc_contrib_defaults::SetDefaults for Types {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -139,7 +139,7 @@ impl Message {
         }
     }
 }
-impl crate::SetDefaults for Message {
+impl ::protoc_contrib_defaults::SetDefaults for Message {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -155,7 +155,7 @@ impl OneOfTwo {
         }
     }
 }
-impl crate::SetDefaults for OneOfTwo {
+impl ::protoc_contrib_defaults::SetDefaults for OneOfTwo {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -171,7 +171,7 @@ impl OneOfThree {
         }
     }
 }
-impl crate::SetDefaults for OneOfThree {
+impl ::protoc_contrib_defaults::SetDefaults for OneOfThree {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -246,7 +246,7 @@ impl Test {
         }
     }
 }
-impl crate::SetDefaults for Test {
+impl ::protoc_contrib_defaults::SetDefaults for Test {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -273,7 +273,7 @@ impl TestOptional {
         }
     }
 }
-impl crate::SetDefaults for TestOptional {
+impl ::protoc_contrib_defaults::SetDefaults for TestOptional {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
