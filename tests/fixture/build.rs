@@ -8,8 +8,9 @@
 //! runs.
 //!
 //! The schema is generated in both of the ways a consumer can mount it: the
-//! main schema as a module tree of its own (`packaging=true`) implementing the
-//! crate's own trait (`impl_trait`), and the `inline.v1` package included into
+//! main schema as a module tree of its own (`packaging=true`) implementing
+//! `protoc_contrib::defaults::SetDefaults` (`impl_trait`), and the `inline.v1`
+//! package included into
 //! buffa's own module for it (`packaging=false`) with inherent methods only,
 //! the way grpc-rust-template does.
 
@@ -54,9 +55,10 @@ fn main() -> Result<()> {
         .parent()
         .context("tests/ sits under the plugin root")?;
     let schema_root = tests.join("proto");
-    // The plugin vendors the options proto the schema imports.
-    let options = plugin.join("proto");
-    let includes = [path(&schema_root), path(&options)];
+    // The options proto the schema imports lives at
+    // `<repo>/protoc_contrib/defaults/options.proto`, so the repository root
+    // is its include root, as in protoc-gen-go-defaults.
+    let includes = [path(&schema_root), path(plugin)];
     let includes: Vec<&str> = includes.iter().map(String::as_str).collect();
 
     for file in SCHEMA.iter().chain(INLINE) {
@@ -76,7 +78,7 @@ fn main() -> Result<()> {
             proto_module: "crate::proto".to_owned(),
             packaging: true,
             extern_paths: Vec::new(),
-            impl_trait: Some("crate::SetDefaults".to_owned()),
+            impl_trait: Some("::protoc_contrib::defaults::SetDefaults".to_owned()),
         },
     )?;
     generate(

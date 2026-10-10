@@ -12,7 +12,6 @@
 //! The binary is the entry point; this library exists so the passes can be
 //! driven from a test without going through stdin.
 
-pub mod annotations;
 mod check;
 pub mod emit;
 mod idents;

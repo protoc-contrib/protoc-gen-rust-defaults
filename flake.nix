@@ -36,15 +36,10 @@
 
           cargoLock.lockFile = ./Cargo.lock;
 
-          # `build.rs` compiles the vendored options proto, so protoc
-          # is needed to build and not only to develop. Named outright rather
-          # than left to a PATH search, which the build sandbox would lose.
-          nativeBuildInputs = [ pkgs.protobuf ];
-          env.PROTOC = "${pkgs.protobuf}/bin/protoc";
-
-          # Only the plugin. The other workspace member is the fixture, which
-          # exists to regenerate and type-check the test schema and has no place
-          # in the binary being shipped.
+          # Only the plugin, and the protoc-contrib crate it reads the
+          # options through, whose generated code is committed: building needs
+          # no protoc. The fixture exists to regenerate and type-check the test
+          # schema and has no place in the binary being shipped.
           cargoBuildFlags = [
             "--package"
             "protoc-gen-rust-defaults"
@@ -59,6 +54,9 @@
 
         devShells.default = pkgs.mkShell {
           inherit (manifest) name;
+          # protoc for the tests: the fixture compiles the test schema, and
+          # protoc-contrib checks its committed code against a fresh
+          # generation.
           packages = [
             rust-toolchain
             pkgs.protobuf
