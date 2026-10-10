@@ -118,7 +118,7 @@ dependencies = [
 
 [[package]]
 name = "defaults-fixture"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "buffa",
@@ -331,7 +331,7 @@ dependencies = [
 
 [[package]]
 name = "protoc-contrib"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "buffa",
  "buffa-build",
@@ -339,7 +339,7 @@ dependencies = [
 
 [[package]]
 name = "protoc-gen-rust-defaults"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "buffa",
