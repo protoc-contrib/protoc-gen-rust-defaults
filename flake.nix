@@ -42,10 +42,9 @@
           nativeBuildInputs = [ pkgs.protobuf ];
           env.PROTOC = "${pkgs.protobuf}/bin/protoc";
 
-          # Only the plugin. The other workspace members are the runtime crate,
-          # which generated code depends on through crates.io, and the fixture,
-          # which exists to regenerate and type-check the test schema; neither
-          # has a place in the binary being shipped.
+          # Only the plugin. The other workspace member is the fixture, which
+          # exists to regenerate and type-check the test schema and has no place
+          # in the binary being shipped.
           cargoBuildFlags = [
             "--package"
             "protoc-gen-rust-defaults"

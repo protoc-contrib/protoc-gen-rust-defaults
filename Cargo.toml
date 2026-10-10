@@ -1,5 +1,5 @@
 [workspace]
-members = ["runtime", "tests/fixture"]
+members = ["tests/fixture"]
 
 [package]
 name = "protoc-gen-rust-defaults"
@@ -12,8 +12,8 @@ homepage = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
 keywords = ["protobuf", "buffa", "defaults", "grpc", "codegen"]
 categories = ["development-tools"]
 # What `cargo install` builds from: the plugin, its build script and the
-# options proto that script compiles. The runtime, the fixture, its test
-# schema, CI and Nix are this repository's, not the crate's.
+# options proto that script compiles. The fixture, its test schema, CI and Nix
+# are this repository's, not the crate's.
 include = ["src/**", "build.rs", "proto/**", "README.md", "LICENSE", "CHANGELOG.md"]
 
 [[bin]]

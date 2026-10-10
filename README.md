@@ -31,9 +31,8 @@ request.set_defaults();
 assert_eq!(request.page_size, 50);
 ```
 
-Generated code depends on
-[protoc-contrib-defaults](https://crates.io/crates/protoc-contrib-defaults), a
-dependency-free crate in this repository holding the `SetDefaults` trait.
+Generated code is plain inherent methods. It depends on nothing beyond the
+`buffa` and `buffa-types` crates the messages already need.
 
 ## Why a plugin
 
@@ -55,11 +54,6 @@ impl ListBooksRequest {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for ListBooksRequest {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 ```
 
 The output for each proto package goes into one file,
@@ -70,8 +64,8 @@ without annotations gets nothing, and a package without them gets no file.
 | --- | --- | --- |
 | `(protoc_contrib.defaults.value)` | a field | Fills the field if it is unset |
 | `(protoc_contrib.defaults.oneof)` | a oneof | Sets the named arm, with its own default, if the oneof is unset |
-| `(protoc_contrib.defaults.skip)` | a message | Nothing; a hand-written `SetDefaults` takes its place |
-| `(protoc_contrib.defaults.unexported)` | a message | `pub(crate) fn apply_defaults` instead, for a hand-written `SetDefaults` to call |
+| `(protoc_contrib.defaults.skip)` | a message | Nothing; a hand-written `set_defaults` takes its place |
+| `(protoc_contrib.defaults.unexported)` | a message | `pub(crate) fn apply_defaults` instead, for a hand-written `set_defaults` to call |
 
 ### Value kinds
 
@@ -86,7 +80,7 @@ its field fails `buf generate` instead of compiling to something else.
 | `enum` / `enum_name` | an enum | By number or by name; both must be defined. Emitted as the variant path, not a number. |
 | `duration` | `google.protobuf.Duration` | Prometheus grammar: `"2d"`, `"1h30m"`, `"42w"`. Parsed at generation time. |
 | `timestamp` | `google.protobuf.Timestamp` | `"now"`, read when the defaults are applied; or RFC3339, RFC1123(Z), RFC850 or RFC822(Z), parsed at generation time. |
-| `message = {initialize, recurse}` | a message | `initialize` creates it if unset. `recurse` calls its `SetDefaults`, if it is set or was just created. |
+| `message = {initialize, recurse}` | a message | `initialize` creates it if unset. `recurse` calls its `set_defaults`, if it is set or was just created. |
 
 Repeated and map fields are rejected, as they are in Go.
 
@@ -108,39 +102,28 @@ with `.into()`, and a message is created and filled through
 configured to represent strings, bytes, boxing, or where `google.protobuf`
 maps to.
 
-### Recursion and `SetDefaults`
+### Recursion
 
-Rust has no reflection that generic code could use to reach a message's
-defaults, which Go's `defaults.Apply` does. Instead, every generated message
-implements `protoc_contrib_defaults::SetDefaults`. An interceptor can apply
-defaults to any request through that trait:
+`message = {recurse: true}` calls the nested message's `set_defaults`, through
+a `MessageField` or a boxed oneof arm. Whether that call is emitted depends on
+the target:
 
-```rust
-fn apply<M: protoc_contrib_defaults::SetDefaults>(message: &mut M) {
-    message.set_defaults();
-}
-```
-
-`message = {recurse: true}` calls `SetDefaults::set_defaults` on the nested
-message, through a `MessageField` or a boxed oneof arm. Whether that call is
-emitted depends on the target:
-
-- **A message with annotations of its own** has a generated impl, so the call
-  is emitted. This also applies to a message in another package, which must be
-  generated with this plugin too.
+- **A message with annotations of its own** has a generated method, so the
+  call is emitted. This also applies to a message in another package, which
+  must be generated with this plugin too.
 - **A `skip` or `unexported` message** is expected to have a hand-written
-  impl, so the call is emitted. If the impl is missing, that's a compile
-  error, not a silent no-op.
+  `set_defaults`, so the call is emitted. If the method is missing, that's a
+  compile error, not a silent no-op.
 - **A message without annotations, or a foreign type** such as
   `google.protobuf.DescriptorProto`, has nothing to call. Recursion into it
   does nothing, as in Go. `initialize` still creates it.
 
 ### Composing with hand-written defaults
 
-Some defaults depend on other fields: minting an id, naming a resource
-from its parent, the update mask an update implies. No annotation can describe
-them. Mark the message `unexported` and write `SetDefaults` around the
-generated body:
+Some defaults depend on other fields: minting an id, naming a resource from
+its parent, the update mask an update implies. No annotation can describe
+them. Mark the message `unexported` and write `set_defaults` around the
+generated body, as Go's `SetDefaults() { x._SetDefaults() }` pattern does:
 
 ```proto
 message CreateBookRequest {
@@ -151,8 +134,8 @@ message CreateBookRequest {
 ```
 
 ```rust
-impl protoc_contrib_defaults::SetDefaults for CreateBookRequest {
-    fn set_defaults(&mut self) {
+impl CreateBookRequest {
+    pub fn set_defaults(&mut self) {
         self.apply_defaults(); // generated
         if self.book_id.is_empty() {
             self.book_id = mint_id();
@@ -161,10 +144,10 @@ impl protoc_contrib_defaults::SetDefaults for CreateBookRequest {
 }
 ```
 
-Rust can't have two inherent `set_defaults` on one type. That's why
-`unexported` generates `apply_defaults` and no trait impl: a generated
-`SetDefaults` calling a hand-written method that doesn't exist yet would
-recurse into itself. `skip` generates nothing, and the whole impl is yours.
+Rust can't have two inherent `set_defaults` on one type, so `unexported`
+generates `apply_defaults` and leaves the name to you. `skip` generates
+nothing, and the whole method is yours. Either way, write it as an
+**inherent** method: that's what a `recurse` into the message calls.
 
 ### Where it differs from protoc-gen-go-defaults
 
@@ -175,6 +158,7 @@ recurse into itself. `skip` generates nothing, and the whole impl is yours.
 | A zone abbreviation in a timestamp (`MST`) | resolved against the generating machine's local zone; an unknown one is read as UTC | the fixed offset RFC 822 gives it (`UT`, `GMT`, `Z`, `EST`…`PDT`); any other abbreviation is an error |
 | `float = nan` / `inf` | emits invalid Go | `f32::NAN`, `f32::INFINITY` |
 | Editions | unsupported | supported, with presence resolved per field |
+| Applying defaults to a message of unknown type | `defaults.Apply` / `ApplyAll`, by reflection | an impl of your own trait, with `impl_trait` |
 
 ## Wiring it up
 
@@ -187,13 +171,6 @@ cargo install protoc-gen-rust-defaults
 
 The build compiles the vendored options proto, so it needs `protoc`, either on
 `PATH` or named by `PROTOC`.
-
-The generated code needs the runtime crate:
-
-```toml
-[dependencies]
-protoc-contrib-defaults = "0.1"
-```
 
 The annotations come from protoc-gen-go-defaults' BSR module, so the schema
 depends on it there:
@@ -250,6 +227,40 @@ generated `mod.rs` in the same directory as a hand-written one silently
 replaces it. Types in other packages are reached with `super` hops, exactly as
 buffa reaches them, so the included file has to sit at the package's own
 position in buffa's tree.
+
+### Generic code: `impl_trait=<path>`
+
+Rust has no reflection that generic code could use to reach a message's
+defaults, which Go's `defaults.Apply` does. If you want an interceptor that
+defaults whatever request it's handed, define a one-method trait in your own
+crate and point the plugin at it:
+
+```rust
+pub trait SetDefaults {
+    fn set_defaults(&mut self);
+}
+```
+
+```yaml
+    opt:
+      - impl_trait=crate::SetDefaults
+```
+
+Every generated `set_defaults` then also gets an impl of that trait,
+delegating to the inherent method:
+
+```rust
+impl crate::SetDefaults for ListBooksRequest {
+    fn set_defaults(&mut self) {
+        Self::set_defaults(self);
+    }
+}
+```
+
+An `unexported` message gets no impl, since its method is yours and so is its
+impl. Without `impl_trait`, the output is inherent methods only. That's enough
+when callers know the concrete type, for example an interceptor that matches
+on the RPC and calls `ListBooksRequest::set_defaults`.
 
 ### `extern_path`
 

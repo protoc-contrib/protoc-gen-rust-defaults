@@ -12,11 +12,6 @@ impl ListBooksRequest {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for ListBooksRequest {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Shelf {
     /// Fills each unset field of `inline.v1.Shelf` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -26,18 +21,11 @@ impl Shelf {
         if self.kind.to_i32() == 0 {
             self.kind = ::buffa::EnumValue::Known(shelf::Kind::KIND_TALL);
         }
-        ::protoc_contrib_defaults::SetDefaults::set_defaults(
-            self.request.get_or_insert_default(),
-        );
+        self.request.get_or_insert_default().set_defaults();
         if self.placement.is_none() {
             self.placement = ::core::option::Option::Some(
                 shelf::Placement::Wall("north".into()),
             );
         }
-    }
-}
-impl ::protoc_contrib_defaults::SetDefaults for Shelf {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }

@@ -1,9 +1,9 @@
 //! Defaults included into buffa's own module for their package
-//! (`packaging=false`), the way grpc-rust-template mounts them.
+//! (`packaging=false`), the way grpc-rust-template mounts them, as inherent
+//! methods with no trait (no `impl_trait`).
 
 use buffa::EnumValue;
 use defaults_fixture::inline::v1::{ListBooksRequest, Shelf, shelf};
-use protoc_contrib_defaults::SetDefaults;
 
 #[test]
 fn defaults_a_page_size() {
@@ -15,7 +15,7 @@ fn defaults_a_page_size() {
         page_size: 10,
         ..Default::default()
     };
-    SetDefaults::set_defaults(&mut request);
+    request.set_defaults();
     assert_eq!(request.page_size, 10);
 }
 

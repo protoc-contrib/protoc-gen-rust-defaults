@@ -66,13 +66,13 @@ impl Types {
         }
         match &mut self.oneof {
             ::core::option::Option::Some(types::Oneof::One(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             ::core::option::Option::Some(types::Oneof::Two(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             ::core::option::Option::Some(types::Oneof::Three(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             _ => {}
         }
@@ -82,9 +82,11 @@ impl Types {
         }
         if self.timestamp.is_unset() {
             let message = self.timestamp.get_or_insert_default();
-            let (seconds, nanos) = ::protoc_contrib_defaults::now();
-            message.seconds = seconds;
-            message.nanos = nanos;
+            let now = ::buffa_types::google::protobuf::Timestamp::from(
+                ::std::time::SystemTime::now(),
+            );
+            message.seconds = now.seconds;
+            message.nanos = now.nanos;
         }
         if self.double_value.is_unset() {
             let message = self.double_value.get_or_insert_default();
@@ -121,7 +123,7 @@ impl Types {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Types {
+impl crate::SetDefaults for Types {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -137,7 +139,7 @@ impl Message {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Message {
+impl crate::SetDefaults for Message {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -153,7 +155,7 @@ impl OneOfTwo {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for OneOfTwo {
+impl crate::SetDefaults for OneOfTwo {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -169,7 +171,7 @@ impl OneOfThree {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for OneOfThree {
+impl crate::SetDefaults for OneOfThree {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -194,7 +196,7 @@ impl Test {
         }
         if let ::core::option::Option::Some(message) = self.message_field.as_option_mut()
         {
-            ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+            message.set_defaults();
         }
         if self.number_value_field.is_unset() {
             let message = self.number_value_field.get_or_insert_default();
@@ -207,9 +209,11 @@ impl Test {
         self.bool_value_field.get_or_insert_default();
         if self.time_value_field.is_unset() {
             let message = self.time_value_field.get_or_insert_default();
-            let (seconds, nanos) = ::protoc_contrib_defaults::now();
-            message.seconds = seconds;
-            message.nanos = nanos;
+            let now = ::buffa_types::google::protobuf::Timestamp::from(
+                ::std::time::SystemTime::now(),
+            );
+            message.seconds = now.seconds;
+            message.nanos = now.nanos;
         }
         if self.duration_value_field.is_unset() {
             let message = self.duration_value_field.get_or_insert_default();
@@ -222,13 +226,13 @@ impl Test {
         }
         match &mut self.oneof {
             ::core::option::Option::Some(test::Oneof::One(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             ::core::option::Option::Some(test::Oneof::Two(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             ::core::option::Option::Some(test::Oneof::Three(message)) => {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                message.set_defaults();
             }
             _ => {}
         }
@@ -242,7 +246,7 @@ impl Test {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Test {
+impl crate::SetDefaults for Test {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -269,7 +273,7 @@ impl TestOptional {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for TestOptional {
+impl crate::SetDefaults for TestOptional {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }

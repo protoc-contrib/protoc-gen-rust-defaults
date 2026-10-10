@@ -59,7 +59,7 @@ pub(super) fn emit(oneof: &Oneof) -> Result<TokenStream> {
             let variant = variant(arm);
             quote! {
                 if let ::core::option::Option::Some(#path::#variant(message)) = &mut #place {
-                    ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                    message.set_defaults();
                 }
             }
         }
@@ -69,7 +69,7 @@ pub(super) fn emit(oneof: &Oneof) -> Result<TokenStream> {
                 match &mut #place {
                     #(
                         ::core::option::Option::Some(#path::#variants(message)) => {
-                            ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                            message.set_defaults();
                         }
                     )*
                     _ => {}

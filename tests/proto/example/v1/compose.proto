@@ -11,8 +11,8 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
-// Generated as `apply_defaults`; the fixture writes `SetDefaults` around it to
-// derive `slug` from `title`, which no annotation can say.
+// Generated as `apply_defaults`; the fixture writes `set_defaults` around it
+// to derive `slug` from `title`, which no annotation can say.
 message Draft {
   option (protoc_contrib.defaults.unexported) = true;
 
@@ -20,7 +20,7 @@ message Draft {
   string slug = 2;
 }
 
-// Generated not at all; the fixture writes `SetDefaults` by hand, and
+// Generated not at all; the fixture writes `set_defaults` by hand, and
 // `Envelope.frozen` recursing into it calls that.
 message Frozen {
   option (protoc_contrib.defaults.skip) = true;

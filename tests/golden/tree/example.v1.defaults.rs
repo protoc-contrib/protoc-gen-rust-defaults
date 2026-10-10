@@ -30,7 +30,7 @@ impl Legacy {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Legacy {
+impl crate::SetDefaults for Legacy {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -60,7 +60,7 @@ impl Edition {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Edition {
+impl crate::SetDefaults for Edition {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -71,21 +71,17 @@ impl Outer {
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
     pub fn set_defaults(&mut self) {
-        ::protoc_contrib_defaults::SetDefaults::set_defaults(
-            self.inner.get_or_insert_default(),
-        );
+        self.inner.get_or_insert_default().set_defaults();
         if self.tier.to_i32() == 0 {
             self.tier = ::buffa::EnumValue::Known(
                 crate::proto::other::v1::Tier::TIER_GOLD,
             );
         }
-        ::protoc_contrib_defaults::SetDefaults::set_defaults(
-            self.shelf.get_or_insert_default(),
-        );
+        self.shelf.get_or_insert_default().set_defaults();
         self.plain.get_or_insert_default();
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Outer {
+impl crate::SetDefaults for Outer {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -106,7 +102,7 @@ impl outer::Inner {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for outer::Inner {
+impl crate::SetDefaults for outer::Inner {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -122,7 +118,7 @@ impl Type {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Type {
+impl crate::SetDefaults for Type {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -144,11 +140,9 @@ impl Envelope {
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines, clippy::default_trait_access)]
     pub fn set_defaults(&mut self) {
-        ::protoc_contrib_defaults::SetDefaults::set_defaults(
-            self.draft.get_or_insert_default(),
-        );
+        self.draft.get_or_insert_default().set_defaults();
         if let ::core::option::Option::Some(message) = self.frozen.as_option_mut() {
-            ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+            message.set_defaults();
         }
         if self.payload.is_none() {
             self.payload = ::core::option::Option::Some(
@@ -167,9 +161,11 @@ impl Envelope {
             if let ::core::option::Option::Some(envelope::Stamp::Created(message)) = &mut self
                 .stamp
             {
-                let (seconds, nanos) = ::protoc_contrib_defaults::now();
-                message.seconds = seconds;
-                message.nanos = nanos;
+                let now = ::buffa_types::google::protobuf::Timestamp::from(
+                    ::std::time::SystemTime::now(),
+                );
+                message.seconds = now.seconds;
+                message.nanos = now.nanos;
             }
         }
         if self.wrapped.is_none() {
@@ -185,7 +181,7 @@ impl Envelope {
         if let ::core::option::Option::Some(envelope::Wrapped::Other(message)) = &mut self
             .wrapped
         {
-            ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+            message.set_defaults();
         }
         if self.negative == 0 {
             self.negative = -5i64;
@@ -207,7 +203,7 @@ impl Envelope {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Envelope {
+impl crate::SetDefaults for Envelope {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }

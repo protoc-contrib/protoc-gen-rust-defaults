@@ -6,6 +6,10 @@
 //! `MessageField`. A field that is set is never written, which is the whole
 //! contract.
 //!
+//! A `recurse` calls the nested message's inherent `set_defaults` with
+//! method-call syntax, which reaches through the `&mut` a `MessageField` lends
+//! and the `Box` a oneof arm holds alike, and needs no trait in scope.
+//!
 //! Concrete field types are never named. A string is assigned with `.into()`,
 //! and a message -- well-known or not -- is created and filled through
 //! `get_or_insert_default()`, so the output does not depend on which
@@ -17,7 +21,7 @@ use proc_macro2::{Literal, TokenStream};
 use quote::{format_ident, quote};
 
 use crate::check::{Scalar, Value};
-use crate::literal::{Instant, Timestamp};
+use crate::literal::Instant;
 use crate::messages::{Field, Shape};
 
 /// The statements that default `field`.
@@ -67,16 +71,14 @@ fn message(value: &Value, place: &TokenStream) -> Result<TokenStream> {
         // recurse through.
         return Ok(match (initialize, recurse) {
             (true, true) => quote! {
-                ::protoc_contrib_defaults::SetDefaults::set_defaults(
-                    #place.get_or_insert_default(),
-                );
+                #place.get_or_insert_default().set_defaults();
             },
             (true, false) => quote! {
                 #place.get_or_insert_default();
             },
             (false, true) => quote! {
                 if let ::core::option::Option::Some(message) = #place.as_option_mut() {
-                    ::protoc_contrib_defaults::SetDefaults::set_defaults(message);
+                    message.set_defaults();
                 }
             },
             (false, false) => TokenStream::new(),
@@ -114,14 +116,19 @@ pub(super) fn fill(value: &Value, target: &TokenStream) -> Result<Vec<TokenStrea
                 vec![quote! { #target.value = #literal; }]
             }
         }
-        Value::Duration(instant) | Value::Timestamp(Timestamp::At(instant)) => {
-            instant_fill(*instant, target)?
+        Value::Duration(instant) | Value::Timestamp(instant) => instant_fill(*instant, target)?,
+        // Converted through the field's own `Timestamp` type, which buffa-types
+        // gives a `From<SystemTime>`, and copied over field by field: the
+        // target may be the message or a box of it, and field access reaches
+        // through either.
+        Value::Now { path } => {
+            let path: syn::Path = syn::parse_str(path)?;
+            vec![quote! {
+                let now = #path::from(::std::time::SystemTime::now());
+                #target.seconds = now.seconds;
+                #target.nanos = now.nanos;
+            }]
         }
-        Value::Timestamp(Timestamp::Now) => vec![quote! {
-            let (seconds, nanos) = ::protoc_contrib_defaults::now();
-            #target.seconds = seconds;
-            #target.nanos = nanos;
-        }],
         Value::Enum { .. } | Value::Message { .. } => Vec::new(),
     })
 }
@@ -157,7 +164,9 @@ pub(super) fn literal(value: &Value) -> Result<Option<TokenStream>> {
                 quote! { ::buffa::EnumValue::Known(#path::#variant) }
             })
         }
-        Value::Duration(_) | Value::Timestamp(_) | Value::Message { .. } => None,
+        Value::Duration(_) | Value::Timestamp(_) | Value::Now { .. } | Value::Message { .. } => {
+            None
+        }
     })
 }
 

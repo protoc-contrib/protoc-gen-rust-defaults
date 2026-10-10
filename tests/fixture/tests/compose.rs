@@ -1,9 +1,10 @@
 //! Generated defaults composed with hand-written ones, reached generically
-//! through `SetDefaults`, and oneofs whose default arm is a well-known type.
+//! through the fixture's own trait (`impl_trait`), and oneofs whose default arm
+//! is a well-known type.
 
 use buffa::MessageField;
+use defaults_fixture::SetDefaults;
 use defaults_fixture::proto::example::v1::{Draft, Envelope, Frozen, envelope};
-use protoc_contrib_defaults::SetDefaults;
 
 /// What an interceptor does: apply the defaults of a message it knows only by
 /// its trait.
@@ -12,7 +13,7 @@ fn apply<M: SetDefaults>(message: &mut M) {
 }
 
 #[test]
-fn reaches_generated_defaults_through_the_trait() {
+fn reaches_generated_defaults_through_the_consumers_trait() {
     let mut envelope = Envelope::default();
     apply(&mut envelope);
     assert_eq!(envelope.negative, -5);

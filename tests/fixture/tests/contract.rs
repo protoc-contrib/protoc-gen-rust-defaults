@@ -12,7 +12,6 @@ use buffa::{EnumValue, MessageField};
 use defaults_fixture::proto::tests::{
     OneOfOne, OneOfThree, OneOfTwo, Test, TestOptional, TestUnexported, Types, test, types,
 };
-use protoc_contrib_defaults::SetDefaults;
 
 fn unix_now() -> i64 {
     i64::try_from(
@@ -125,7 +124,7 @@ fn recurses_into_an_active_arm_the_caller_chose() {
 }
 
 #[test]
-fn recurses_into_a_skipped_arm_through_its_hand_written_impl() {
+fn recurses_into_a_skipped_arm_through_its_hand_written_method() {
     let mut test = Test {
         oneof: Some(test::Oneof::One(Box::default())),
         ..Default::default()
@@ -219,9 +218,9 @@ fn fills_only_absent_optional_fields() {
 }
 
 #[test]
-fn an_unexported_message_is_defaulted_through_its_hand_written_impl() {
+fn an_unexported_message_is_defaulted_through_its_hand_written_method() {
     let mut unexported = TestUnexported::default();
-    SetDefaults::set_defaults(&mut unexported);
+    unexported.set_defaults();
     assert_eq!(unexported.string_field.as_deref(), Some("string_field"));
     assert_eq!(unexported.number_field, Some(42));
 }

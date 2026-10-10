@@ -35,10 +35,10 @@ jobs:
       - name: Run Tests
         run: nix develop --command cargo test --workspace
 
-      # Builds each published crate from what `include` ships, so a packaging
-      # break shows up on the pull request rather than in the publish job.
+      # Builds the plugin from what `include` ships, so a packaging break shows
+      # up on the pull request rather than in the publish job.
       - name: Check Package
-        run: nix develop --command cargo package --package protoc-contrib-defaults --package protoc-gen-rust-defaults
+        run: nix develop --command cargo package --package protoc-gen-rust-defaults
 
   release:
     needs: test
@@ -128,11 +128,7 @@ jobs:
         uses: rust-lang/crates-io-auth-action@v1
         id: auth
 
-      # The runtime first: generated code depends on it, so a plugin release
-      # must never be installable before the runtime version it targets.
       - name: Publish to Crates.io
-        run: |
-          nix develop --command cargo publish --package protoc-contrib-defaults
-          nix develop --command cargo publish --package protoc-gen-rust-defaults
+        run: nix develop --command cargo publish --package protoc-gen-rust-defaults
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

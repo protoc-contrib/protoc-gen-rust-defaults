@@ -15,7 +15,7 @@ impl Shelf {
         }
     }
 }
-impl ::protoc_contrib_defaults::SetDefaults for Shelf {
+impl crate::SetDefaults for Shelf {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }

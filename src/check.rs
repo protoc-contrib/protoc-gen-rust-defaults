@@ -45,7 +45,14 @@ pub enum Value {
         closed: bool,
     },
     Duration(Instant),
-    Timestamp(Timestamp),
+    /// A fixed `Timestamp`, resolved at generation time.
+    Timestamp(Instant),
+    /// `timestamp = "now"`, read off the clock when the defaults are applied.
+    Now {
+        /// The Rust path of the field's `Timestamp` type, which converts from
+        /// a `SystemTime`.
+        path: String,
+    },
     /// `message = { initialize, recurse }`. `recurse` is already narrowed to
     /// the targets that have a `set_defaults` to call; see
     /// [`Schema::recurses_into`].
@@ -125,9 +132,14 @@ pub(crate) fn value(
                     describe(field)
                 ));
             }
-            let timestamp = literal::timestamp(text)
-                .map_err(|error| format!("invalid timestamp {text:?}: {error}"))?;
-            Value::Timestamp(timestamp)
+            match literal::timestamp(text)
+                .map_err(|error| format!("invalid timestamp {text:?}: {error}"))?
+            {
+                Timestamp::At(instant) => Value::Timestamp(instant),
+                Timestamp::Now => Value::Now {
+                    path: schema.type_path(TIMESTAMP, package),
+                },
+            }
         }
         Default::Message(message) => {
             if kind != Type::TYPE_MESSAGE {

@@ -8,9 +8,10 @@
 //! runs.
 //!
 //! The schema is generated in both of the ways a consumer can mount it: the
-//! main schema as a module tree of its own (`packaging=true`), and the
-//! `inline.v1` package included into buffa's own module for it
-//! (`packaging=false`), the way grpc-rust-template does.
+//! main schema as a module tree of its own (`packaging=true`) implementing the
+//! crate's own trait (`impl_trait`), and the `inline.v1` package included into
+//! buffa's own module for it (`packaging=false`) with inherent methods only,
+//! the way grpc-rust-template does.
 
 use std::path::{Path, PathBuf};
 
@@ -75,6 +76,7 @@ fn main() -> Result<()> {
             proto_module: "crate::proto".to_owned(),
             packaging: true,
             extern_paths: Vec::new(),
+            impl_trait: Some("crate::SetDefaults".to_owned()),
         },
     )?;
     generate(

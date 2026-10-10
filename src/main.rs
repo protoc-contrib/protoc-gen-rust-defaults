@@ -78,6 +78,7 @@ fn parse_options(parameter: &str) -> emit::Options {
         };
         match key.trim() {
             "proto_module" => value.trim().clone_into(&mut options.proto_module),
+            "impl_trait" => options.impl_trait = Some(value.trim().to_owned()),
             "packaging" => {
                 if let Ok(value) = value.trim().parse() {
                     options.packaging = value;
@@ -126,6 +127,15 @@ mod tests {
         // worth failing a build over, and the default is the safe direction --
         // an unused mod.rs, rather than a missing one.
         assert!(parse_options("packaging=no").packaging);
+    }
+
+    #[test]
+    fn implements_no_trait_unless_asked_to() {
+        assert_eq!(parse_options("").impl_trait, None);
+        assert_eq!(
+            parse_options("packaging=false,impl_trait=crate::sdk::SetDefaults").impl_trait,
+            Some("crate::sdk::SetDefaults".to_owned())
+        );
     }
 
     #[test]

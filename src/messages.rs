@@ -46,7 +46,8 @@ pub struct Message {
 /// The method a message's defaults are emitted as.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
-    /// `pub fn set_defaults`, and `impl SetDefaults` calling it.
+    /// `pub fn set_defaults`, and the `impl_trait` impl calling it if one is
+    /// asked for.
     SetDefaults,
     /// `(protoc_contrib.defaults.unexported)`: only `pub(crate) fn
     /// apply_defaults`, for a hand-written `set_defaults` to wrap.
@@ -207,12 +208,13 @@ impl<'a> Schema<'a> {
             .unwrap_or(false)
     }
 
-    /// Whether a `recurse` into a field of message type `fqn` has a
-    /// `SetDefaults` impl to call.
+    /// Whether a `recurse` into a field of message type `fqn` has an inherent
+    /// `set_defaults` to call.
     ///
     /// It does when the message has defaults of its own, so this plugin
     /// generates one, and when it is `skip` or `unexported`, which say a
-    /// hand-written one takes the generated one's place. Anything else -- a
+    /// hand-written one takes the generated one's place -- and a missing one
+    /// is a compile error rather than a recursion silently skipped. Anything else -- a
     /// message without defaults, a well-known or foreign type -- has nothing
     /// to call, and recursing into it is a no-op, as it is in
     /// protoc-gen-go-defaults.
