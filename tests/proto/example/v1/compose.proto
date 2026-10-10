@@ -1,0 +1,60 @@
+// Generated defaults composed with hand-written ones, oneofs whose default arm
+// is a well-known type, and literals that need more than a plain number.
+
+syntax = "proto3";
+
+package example.v1;
+
+import "protoc_contrib/defaults/options.proto";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+// Generated as `apply_defaults`; the fixture writes `set_defaults` around it
+// to derive `slug` from `title`, which no annotation can say.
+message Draft {
+  option (protoc_contrib.defaults.unexported) = true;
+
+  string title = 1 [(protoc_contrib.defaults.value).string = "untitled"];
+  string slug = 2;
+}
+
+// Generated not at all; the fixture writes `set_defaults` by hand, and
+// `Envelope.frozen` recursing into it calls that.
+message Frozen {
+  option (protoc_contrib.defaults.skip) = true;
+
+  string state = 1 [(protoc_contrib.defaults.value).string = "never generated"];
+}
+
+message Envelope {
+  Draft draft = 1 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+  Frozen frozen = 2 [(protoc_contrib.defaults.value).message = {recurse: true}];
+
+  oneof payload {
+    option (protoc_contrib.defaults.oneof) = "ttl";
+    google.protobuf.Duration ttl = 3 [(protoc_contrib.defaults.value).duration = "1h30m"];
+    google.protobuf.Timestamp at = 4 [(protoc_contrib.defaults.value).timestamp = "now"];
+    google.protobuf.StringValue note = 5 [(protoc_contrib.defaults.value).string = "n/a"];
+  }
+
+  oneof stamp {
+    option (protoc_contrib.defaults.oneof) = "created";
+    google.protobuf.Timestamp created = 6 [(protoc_contrib.defaults.value).timestamp = "now"];
+    string label = 7;
+  }
+
+  oneof wrapped {
+    option (protoc_contrib.defaults.oneof) = "count";
+    google.protobuf.Int32Value count = 8 [(protoc_contrib.defaults.value).int32 = 9];
+    Draft other = 9 [(protoc_contrib.defaults.value).message = {recurse: true}];
+  }
+
+  int64 negative = 10 [(protoc_contrib.defaults.value).int64 = -5];
+  float not_a_number = 11 [(protoc_contrib.defaults.value).float = nan];
+  uint64 big = 12 [(protoc_contrib.defaults.value).uint64 = 18446744073709551615];
+  string quoted = 13 [(protoc_contrib.defaults.value).string = "say \"hi\"\n"];
+  bytes binary = 14 [(protoc_contrib.defaults.value).bytes = "\x00\xff"];
+  double tiny = 15 [(protoc_contrib.defaults.value).double = 1e-300];
+}

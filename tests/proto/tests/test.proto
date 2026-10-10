@@ -1,0 +1,97 @@
+// Copyright 2021 Linka Cloud  All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Ported from protoc-gen-go-defaults' internal/generator/testpb/test.proto, so
+// both plugins are checked against one contract. Kept as close to the
+// original as the import paths allow; a difference in how the two plugins
+// treat it belongs in the README's list of deviations, not in an edit here.
+
+syntax = "proto3";
+
+package tests;
+
+import "protoc_contrib/defaults/options.proto";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/descriptor.proto";
+import "tests/types.proto";
+
+message Test {
+	string string_field = 1 [(protoc_contrib.defaults.value).string = "string_field"];
+	int64 number_field = 2 [(protoc_contrib.defaults.value).int64 = 42];
+	bool bool_field = 3 [(protoc_contrib.defaults.value).bool = true];
+	enum Type {
+		NONE = 0;
+		ONE = 1;
+		TWO = 2;
+	}
+	Type enum_field = 4 [(protoc_contrib.defaults.value).enum = 2];
+	Test message_field = 5 [(protoc_contrib.defaults.value).message = {recurse: true}];
+	repeated string repeated_string_field = 6;
+	repeated Type repeated_message_field = 7;
+	google.protobuf.Int64Value number_value_field = 8 [(protoc_contrib.defaults.value).int64 = 43];
+	google.protobuf.StringValue string_value_field = 9 [(protoc_contrib.defaults.value).string = "string_value"];
+	google.protobuf.BoolValue bool_value_field = 10 [(protoc_contrib.defaults.value).bool = false];
+	google.protobuf.Timestamp time_value_field = 11 [(protoc_contrib.defaults.value).timestamp = "now"];
+	google.protobuf.Duration duration_value_field = 12 [(protoc_contrib.defaults.value).duration = "42w"];
+
+	oneof oneof {
+		option (protoc_contrib.defaults.oneof) = "two";
+		OneOfOne one = 13 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+		OneOfTwo two = 14 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+		OneOfThree three = 15 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+		Type four = 16 [(protoc_contrib.defaults.value).enum = 1];
+	}
+
+	google.protobuf.DescriptorProto descriptor = 17 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+	google.protobuf.Timestamp time_value_field_with_default = 18 [(protoc_contrib.defaults.value).timestamp = "1952-03-11T00:00:00Z"];
+	bytes bytes = 19 [(protoc_contrib.defaults.value).bytes = "??"];
+}
+
+message TestOptional {
+	optional string string_field = 1 [(protoc_contrib.defaults.value).string = "string_field"];
+	optional int64 number_field = 2 [(protoc_contrib.defaults.value).int64 = 42];
+	optional bool bool_field = 3 [(protoc_contrib.defaults.value).bool = true];
+	enum Type {
+		NONE = 0;
+		ONE = 1;
+		TWO = 2;
+	}
+	optional Type enum_field = 4 [(protoc_contrib.defaults.value).enum = 2];
+}
+
+// TestAutoRecurse deliberately carries no (defaults.value) annotations on
+// its fields so the generator emits no SetDefaults() for it. It exists to
+// exercise defaults.ApplyAll, which must still descend into the populated
+// Message/list/map values and apply their own defaults.
+message TestAutoRecurse {
+	Message embedded = 1;
+	repeated Message list = 2;
+	map<string, Message> entries = 3;
+}
+
+message TestUnexported {
+	option (protoc_contrib.defaults.unexported) = true;
+	optional string string_field = 1 [(protoc_contrib.defaults.value).string = "string_field"];
+	optional int64 number_field = 2 [(protoc_contrib.defaults.value).int64 = 42];
+	optional bool bool_field = 3 [(protoc_contrib.defaults.value).bool = true];
+	enum Type {
+		NONE = 0;
+		ONE = 1;
+		TWO = 2;
+	}
+	optional Type enum_field = 4 [(protoc_contrib.defaults.value).enum = 2];
+}
