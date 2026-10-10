@@ -1,0 +1,15 @@
+[package]
+name = "protoc-contrib-defaults"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "The SetDefaults trait protoc-gen-rust-defaults implements for buffa messages."
+repository = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
+homepage = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
+keywords = ["protobuf", "buffa", "defaults"]
+categories = ["encoding"]
+readme = "../README.md"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
