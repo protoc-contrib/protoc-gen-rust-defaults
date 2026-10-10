@@ -1,10 +1,10 @@
 //! Generated defaults composed with hand-written ones, reached generically
-//! through `protoc_contrib_defaults::SetDefaults` (`impl_trait`), and oneofs
+//! through `protoc_contrib::defaults::SetDefaults` (`impl_trait`), and oneofs
 //! whose default arm is a well-known type.
 
 use buffa::MessageField;
 use defaults_fixture::proto::example::v1::{Draft, Envelope, Frozen, envelope};
-use protoc_contrib_defaults::SetDefaults;
+use protoc_contrib::defaults::SetDefaults;
 
 /// What an interceptor does: apply the defaults of a message it knows only by
 /// its trait.

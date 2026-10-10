@@ -9,7 +9,7 @@
 //!
 //! The schema is generated in both of the ways a consumer can mount it: the
 //! main schema as a module tree of its own (`packaging=true`) implementing
-//! `protoc_contrib_defaults::SetDefaults` (`impl_trait`), and the `inline.v1`
+//! `protoc_contrib::defaults::SetDefaults` (`impl_trait`), and the `inline.v1`
 //! package included into
 //! buffa's own module for it (`packaging=false`) with inherent methods only,
 //! the way grpc-rust-template does.
@@ -78,7 +78,7 @@ fn main() -> Result<()> {
             proto_module: "crate::proto".to_owned(),
             packaging: true,
             extern_paths: Vec::new(),
-            impl_trait: Some("::protoc_contrib_defaults::SetDefaults".to_owned()),
+            impl_trait: Some("::protoc_contrib::defaults::SetDefaults".to_owned()),
         },
     )?;
     generate(

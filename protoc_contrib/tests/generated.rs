@@ -1,9 +1,10 @@
-//! `src/generated` is buffa's output for the `options.proto` beside this
-//! crate, committed so depending on it needs no `protoc`. This regenerates it and fails if the
-//! committed copy has drifted -- from the proto, or from the buffa it targets.
+//! `src/defaults/generated` is buffa's output for `defaults/options.proto`,
+//! committed so depending on this crate needs no `protoc`. This regenerates it
+//! and fails if the committed copy has drifted -- from the proto, or from the
+//! buffa it targets.
 //!
-//! Regenerate with `UPDATE_GENERATED=1 cargo test -p protoc-contrib-defaults
-//! --test generated` and review the diff.
+//! Regenerate with `UPDATE_GENERATED=1 cargo test -p protoc-contrib --test
+//! generated` and review the diff.
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -13,11 +14,11 @@ const OPTIONS: &str = "protoc_contrib/defaults/options.proto";
 #[test]
 fn committed_code_matches_a_fresh_generation() {
     let manifest = Path::new(env!("CARGO_MANIFEST_DIR"));
-    // The crate sits beside the proto at `<repo>/protoc_contrib/defaults`, so
-    // the repository root is the proto's include root.
-    let proto_root = manifest.join("../..");
-    let committed = manifest.join("src/generated");
-    let fresh = Path::new(env!("CARGO_TARGET_TMPDIR")).join("protoc-contrib-defaults");
+    // The crate is `<repo>/protoc_contrib`, holding the proto at
+    // `defaults/options.proto`, so the repository root is its include root.
+    let proto_root = manifest.join("..");
+    let committed = manifest.join("src/defaults/generated");
+    let fresh = Path::new(env!("CARGO_TARGET_TMPDIR")).join("protoc-contrib");
     let _ = std::fs::remove_dir_all(&fresh);
     std::fs::create_dir_all(&fresh).unwrap();
 
@@ -57,7 +58,7 @@ fn committed_code_matches_a_fresh_generation() {
         .collect();
     assert!(
         stale.is_empty(),
-        "src/generated is out of date: {stale:?}\n\
+        "src/defaults/generated is out of date: {stale:?}\n\
          rerun with UPDATE_GENERATED=1 and review the diff"
     );
 }

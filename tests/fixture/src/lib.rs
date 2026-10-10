@@ -9,7 +9,7 @@
 //! schema's `skip` and `unexported` messages ask for in place of generated
 //! ones.
 
-use protoc_contrib_defaults::SetDefaults;
+use protoc_contrib::defaults::SetDefaults;
 
 /// The buffa-generated message types.
 pub mod proto {

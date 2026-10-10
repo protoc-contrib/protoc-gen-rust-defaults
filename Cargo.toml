@@ -1,5 +1,5 @@
 [workspace]
-members = ["protoc_contrib/defaults", "tests/fixture"]
+members = ["protoc_contrib", "tests/fixture"]
 
 [package]
 name = "protoc-gen-rust-defaults"
@@ -11,7 +11,7 @@ repository = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
 homepage = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
 # Installed from GitHub -- the flake, the release binaries or `cargo install
 # --git` -- rather than crates.io: it reads the options through the
-# protoc_contrib/defaults crate beside their proto, which is GitHub-only too.
+# protoc-contrib crate beside their proto, which is GitHub-only too.
 publish = false
 
 [[bin]]
@@ -30,7 +30,7 @@ pedantic = { level = "deny", priority = -1 }
 # The protoc_contrib.defaults options, compiled for buffa: the same types a
 # consumer reads them with, so the plugin and its users cannot disagree on
 # what an annotation says.
-protoc-contrib-defaults = { path = "protoc_contrib/defaults" }
+protoc-contrib = { path = "protoc_contrib" }
 # The descriptor and plugin-protocol types, and the type-path resolution the
 # generated code has to agree with. Pinned to the same minor as the buffa
 # codegen whose output this extends -- an enum or oneof named by a different

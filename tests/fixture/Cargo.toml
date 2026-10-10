@@ -20,7 +20,7 @@ buffa-types = "0.9.2"
 # prove a foreign message is a no-op.
 buffa-descriptor = "0.9.2"
 # The trait the main schema's messages implement (`impl_trait`).
-protoc-contrib-defaults = { path = "../../protoc_contrib/defaults" }
+protoc-contrib = { path = "../../protoc_contrib" }
 
 [build-dependencies]
 # The plugin as a library rather than as a `protoc` plugin binary: a build

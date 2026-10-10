@@ -231,19 +231,19 @@ position in buffa's tree.
 Rust has no reflection that generic code could use to reach a message's
 defaults, which Go's `defaults.Apply` does. If you want an interceptor that
 defaults whatever request it's handed, point the plugin at a trait with a
-`fn set_defaults(&mut self)`. The [`protoc-contrib-defaults`
-crate](#the-protoc-contrib-defaults-crate) has one:
+`fn set_defaults(&mut self)`. The [`protoc-contrib`
+crate](#the-protoc-contrib-crate) has one:
 
 ```yaml
     opt:
-      - impl_trait=::protoc_contrib_defaults::SetDefaults
+      - impl_trait=::protoc_contrib::defaults::SetDefaults
 ```
 
 Every generated `set_defaults` then also gets an impl of that trait,
 delegating to the inherent method:
 
 ```rust
-impl ::protoc_contrib_defaults::SetDefaults for ListBooksRequest {
+impl ::protoc_contrib::defaults::SetDefaults for ListBooksRequest {
     fn set_defaults(&mut self) {
         Self::set_defaults(self);
     }
@@ -270,12 +270,13 @@ plugin names is then named where buffa put it:
 Well-known types need none. They resolve to `buffa-types` here, the same as
 in buffa.
 
-### The `protoc-contrib-defaults` crate
+### The `protoc-contrib` crate
 
-`protoc_contrib/defaults` holds the Rust side of the
-`protoc_contrib.defaults` package, beside its `options.proto`. It's the
-counterpart of protoc-gen-go-defaults' `protoc_contrib/defaults` Go package,
-and it has two parts:
+`protoc_contrib/` holds the Rust side of the `protoc_contrib.*` proto
+packages, one module per package, beside their `.proto` files.
+`protoc_contrib::defaults` is the counterpart of protoc-gen-go-defaults'
+`protoc_contrib/defaults` Go package, built from
+`protoc_contrib/defaults/options.proto`, and it has two parts:
 
 - **The options compiled for buffa:** `FieldDefaults`, `MessageDefaults`, and
   the `VALUE`, `ONEOF`, `SKIP` and `UNEXPORTED` extensions, for reading the
@@ -289,7 +290,7 @@ release tag of the plugin that generated your code:
 
 ```toml
 [dependencies]
-protoc-contrib-defaults = { git = "https://github.com/protoc-contrib/protoc-gen-rust-defaults", tag = "vX.Y.Z" }
+protoc-contrib = { git = "https://github.com/protoc-contrib/protoc-gen-rust-defaults", tag = "vX.Y.Z" }
 ```
 
 ### Nix
@@ -325,13 +326,13 @@ code, so a change to its shape shows up in review. Regenerate it with:
 UPDATE_GOLDEN=1 cargo test -p defaults-fixture --test golden
 ```
 
-`protoc_contrib/defaults/src/generated` is buffa's output for
+`protoc_contrib/src/defaults/generated` is buffa's output for
 `protoc_contrib/defaults/options.proto`, and a test fails if it drifts from a
 fresh generation. After changing the proto or the buffa version, regenerate it
 with:
 
 ```bash
-UPDATE_GENERATED=1 cargo test -p protoc-contrib-defaults --test generated
+UPDATE_GENERATED=1 cargo test -p protoc-contrib --test generated
 ```
 
 ## License

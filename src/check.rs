@@ -12,7 +12,7 @@ use field_descriptor_proto::{Label, Type};
 
 use crate::literal::{self, Instant, Timestamp};
 use crate::messages::Schema;
-use protoc_contrib_defaults::{FieldDefaults, field_defaults};
+use protoc_contrib::defaults::{FieldDefaults, field_defaults};
 
 /// A scalar default, typed as the field holds it.
 #[derive(Debug, Clone, PartialEq)]

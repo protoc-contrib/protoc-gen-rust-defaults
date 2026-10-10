@@ -1,7 +1,8 @@
-//! The Rust side of the `protoc_contrib.defaults` package, beside its
-//! `options.proto`: the counterpart of protoc-gen-go-defaults'
-//! `protoc_contrib/defaults` Go package, and like it, part of the plugin's
-//! repository, [protoc-gen-rust-defaults](https://github.com/protoc-contrib/protoc-gen-rust-defaults).
+//! The `protoc_contrib.defaults` package, from
+//! `protoc_contrib/defaults/options.proto`: the counterpart of
+//! protoc-gen-go-defaults' `protoc_contrib/defaults` Go package, and like it,
+//! part of the plugin's repository,
+//! [protoc-gen-rust-defaults](https://github.com/protoc-contrib/protoc-gen-rust-defaults).
 //!
 //! It holds two things:
 //!
@@ -13,7 +14,7 @@
 //!   `protoc`.
 //! - **[`SetDefaults`]**, the trait to code against messages generically
 //!   with. The generated `set_defaults` methods are inherent; run the plugin
-//!   with `impl_trait=::protoc_contrib_defaults::SetDefaults` and each also
+//!   with `impl_trait=::protoc_contrib::defaults::SetDefaults` and each also
 //!   implements this.
 //!
 //! Go's `defaults.Apply` fills a message by reflection, which buffa does not
@@ -35,12 +36,12 @@ pub use generated::protoc_contrib::defaults::*;
 ///
 /// Implemented by every message protoc-gen-rust-defaults generates a
 /// `set_defaults` for, when it is run with
-/// `impl_trait=::protoc_contrib_defaults::SetDefaults`. An `unexported`
+/// `impl_trait=::protoc_contrib::defaults::SetDefaults`. An `unexported`
 /// message is the exception: its `set_defaults` is hand-written, and so is its
 /// impl.
 ///
 /// ```ignore
-/// fn apply<M: protoc_contrib_defaults::SetDefaults>(request: &mut M) {
+/// fn apply<M: protoc_contrib::defaults::SetDefaults>(request: &mut M) {
 ///     request.set_defaults();
 /// }
 /// ```

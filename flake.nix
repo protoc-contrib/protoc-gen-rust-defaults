@@ -36,7 +36,7 @@
 
           cargoLock.lockFile = ./Cargo.lock;
 
-          # Only the plugin, and the protoc_contrib/defaults crate it reads the
+          # Only the plugin, and the protoc-contrib crate it reads the
           # options through, whose generated code is committed: building needs
           # no protoc. The fixture exists to regenerate and type-check the test
           # schema and has no place in the binary being shipped.
@@ -55,7 +55,7 @@
         devShells.default = pkgs.mkShell {
           inherit (manifest) name;
           # protoc for the tests: the fixture compiles the test schema, and
-          # protoc_contrib/defaults checks its committed code against a fresh
+          # protoc-contrib checks its committed code against a fresh
           # generation.
           packages = [
             rust-toolchain
