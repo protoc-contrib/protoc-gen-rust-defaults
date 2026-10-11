@@ -68,8 +68,54 @@ jobs:
       - name: Run Tests
         run: nix develop --command cargo test --workspace
 
-  release:
+  # Builds the shipped binary on every pull request, not only on release, so
+  # a Nix build break -- a stale outputHashes entry, say -- fails the
+  # required check before merge instead of the next release.
+  build:
     needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            nix_system: x86_64-linux
+          - os: macos-15
+            nix_system: aarch64-darwin
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    timeout-minutes: 60
+    env:
+      BIN_PATH: protoc-gen-rust-defaults-${{ matrix.nix_system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v23
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v15
+        with:
+          use-flakehub: disabled
+          use-gha-cache: enabled
+
+      - name: Build with Nix
+        run: nix build .#source --system ${{ matrix.nix_system }}
+
+      - name: Prepare Binary
+        run: install -m 0755 result/bin/protoc-gen-rust-defaults "$BIN_PATH"
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ env.BIN_PATH }}
+          archive: false
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
@@ -94,54 +140,34 @@ jobs:
           config-file: .github/config/release-please-config.json
           target-branch: main
 
-  build:
+  publish:
     needs: release
-    if: ${{ needs.release.outputs.release_created }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            nix_system: x86_64-linux
-          - os: macos-15
-            nix_system: aarch64-darwin
-    runs-on: ${{ matrix.os }}
+    if: needs.release.outputs.release_created
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v23
-
-      - name: Setup Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v15
+      - name: Download Binaries
+        uses: actions/download-artifact@v8
         with:
-          use-flakehub: disabled
-          use-gha-cache: enabled
-
-      - name: Build with Nix
-        run: nix build .#source --system ${{ matrix.nix_system }}
-
-      - name: Prepare Release Assets
-        run: |
-          mkdir -p release && install -m 0755 result/bin/protoc-gen-rust-defaults \
-            release/protoc-gen-rust-defaults-${{ matrix.nix_system }}
+          pattern: protoc-gen-rust-defaults-*
+          merge-multiple: true
+          skip-decompress: true
+          path: release/
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.tag_name }}
-          files: release/protoc-gen-rust-defaults-${{ matrix.nix_system }}
+          files: release/*
 
   # Pins the binaries just published in
   # .github/config/nix-release-bin-manifest.json, so the flake installs them
   # instead of building from source. The pull request is opened with the App
   # token, as one opened with GITHUB_TOKEN starts no CI.
   pin:
-    needs: [release, build]
+    needs: [release, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: read
