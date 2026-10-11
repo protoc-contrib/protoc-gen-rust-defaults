@@ -175,11 +175,13 @@ fn request(
 /// with, at the rev `Cargo.lock` pins, rather than a copy that can drift.
 ///
 /// Cargo tells a build script nothing about where a dependency's source is,
-/// so ask `cargo metadata`. By the time this runs, the checkout is on disk.
+/// so ask `cargo metadata`. Not `--offline`: it resolves the whole lockfile,
+/// optional dependencies no feature enables included, and those were never
+/// downloaded for this build.
 fn protoc_types_protos(plugin: &Path) -> Result<PathBuf> {
     let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned());
     let output = Command::new(cargo)
-        .args(["metadata", "--format-version=1", "--locked", "--offline"])
+        .args(["metadata", "--format-version=1", "--locked"])
         .arg("--manifest-path")
         .arg(plugin.join("Cargo.toml"))
         .output()
