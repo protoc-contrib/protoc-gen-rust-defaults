@@ -1,10 +1,10 @@
 //! Generates `set_defaults(&mut self)` for the owned message types
-//! `protoc-gen-buffa` emits, from the `protoc_contrib.defaults` annotations on
+//! `protoc-gen-buffa` emits, from the `protoc.contrib.defaults` annotations on
 //! a protobuf schema.
 //!
 //! The Rust counterpart of
 //! [protoc-gen-go-defaults](https://github.com/protoc-contrib/protoc-gen-go-defaults),
-//! reading the same `protoc_contrib/defaults/options.proto`, so a schema shared
+//! reading the same `protoc/contrib/defaults/options.proto`, so a schema shared
 //! by a Go and a Rust service declares its defaults once. Generated code is
 //! inherent methods with no dependency beyond buffa.
 //!

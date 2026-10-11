@@ -1,4 +1,4 @@
-//! Reads one field's `(protoc_contrib.defaults.value)` into the [`Value`] the
+//! Reads one field's `(protoc.contrib.defaults.value)` into the [`Value`] the
 //! emitter assigns, checking it against the field it annotates on the way.
 //!
 //! The checks, and the wording of every error, are protoc-gen-go-defaults'
@@ -12,7 +12,7 @@ use field_descriptor_proto::{Label, Type};
 
 use crate::literal::{self, Instant, Timestamp};
 use crate::messages::Schema;
-use protoc_contrib::defaults::{FieldDefaults, field_defaults};
+use protoc_types::contrib::defaults::{FieldDefaults, field_defaults};
 
 /// A scalar default, typed as the field holds it.
 #[derive(Debug, Clone, PartialEq)]

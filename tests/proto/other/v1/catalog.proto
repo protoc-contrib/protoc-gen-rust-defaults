@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package other.v1;
 
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 
 enum Tier {
   TIER_UNSPECIFIED = 0;
@@ -13,8 +13,8 @@ enum Tier {
 }
 
 message Shelf {
-  string aisle = 1 [(protoc_contrib.defaults.value).string = "A1"];
-  Tier tier = 2 [(protoc_contrib.defaults.value).enum_name = "TIER_SILVER"];
+  string aisle = 1 [(protoc.contrib.defaults.value).string = "A1"];
+  Tier tier = 2 [(protoc.contrib.defaults.value).enum_name = "TIER_SILVER"];
 }
 
 message Plain {

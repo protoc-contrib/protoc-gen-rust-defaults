@@ -6,7 +6,7 @@ edition = "2023";
 
 package example.v1;
 
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 
 enum Mode {
   MODE_UNSPECIFIED = 0;
@@ -21,15 +21,15 @@ enum Strictness {
 }
 
 message Edition {
-  int32 explicit_count = 1 [(protoc_contrib.defaults.value).int32 = 7];
+  int32 explicit_count = 1 [(protoc.contrib.defaults.value).int32 = 7];
   int32 implicit_count = 2 [
     features.field_presence = IMPLICIT,
-    (protoc_contrib.defaults.value).int32 = 8
+    (protoc.contrib.defaults.value).int32 = 8
   ];
   string implicit_name = 3 [
     features.field_presence = IMPLICIT,
-    (protoc_contrib.defaults.value).string = "edition"
+    (protoc.contrib.defaults.value).string = "edition"
   ];
-  Mode mode = 4 [(protoc_contrib.defaults.value).enum_name = "MODE_FAST"];
-  Strictness strictness = 5 [(protoc_contrib.defaults.value).enum_name = "STRICTNESS_ON"];
+  Mode mode = 4 [(protoc.contrib.defaults.value).enum_name = "MODE_FAST"];
+  Strictness strictness = 5 [(protoc.contrib.defaults.value).enum_name = "STRICTNESS_ON"];
 }

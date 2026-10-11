@@ -2,7 +2,7 @@
 #[allow(unused_imports, clippy::wildcard_imports)]
 use super::*;
 impl Types {
-    /// Fills each unset field of `tests.Types` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.Types` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines, clippy::default_trait_access)]
@@ -124,7 +124,7 @@ impl Types {
     }
 }
 impl Message {
-    /// Fills each unset field of `tests.Message` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.Message` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -135,7 +135,7 @@ impl Message {
     }
 }
 impl OneOfTwo {
-    /// Fills each unset field of `tests.OneOfTwo` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.OneOfTwo` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -146,7 +146,7 @@ impl OneOfTwo {
     }
 }
 impl OneOfThree {
-    /// Fills each unset field of `tests.OneOfThree` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.OneOfThree` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -157,7 +157,7 @@ impl OneOfThree {
     }
 }
 impl Test {
-    /// Fills each unset field of `tests.Test` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.Test` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines, clippy::default_trait_access)]
@@ -227,7 +227,7 @@ impl Test {
     }
 }
 impl TestOptional {
-    /// Fills each unset field of `tests.TestOptional` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.TestOptional` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -249,9 +249,9 @@ impl TestOptional {
     }
 }
 impl TestUnexported {
-    /// Fills each unset field of `tests.TestUnexported` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `tests.TestUnexported` with its `(protoc.contrib.defaults.value)`.
     ///
-    /// Generated in place of `set_defaults`, because the message is `(protoc_contrib.defaults.unexported)`: a hand-written `set_defaults` calls this and adds its own logic.
+    /// Generated in place of `set_defaults`, because the message is `(protoc.contrib.defaults.unexported)`: a hand-written `set_defaults` calls this and adds its own logic.
     #[allow(clippy::too_many_lines)]
     pub(crate) fn apply_defaults(&mut self) {
         if self.string_field.is_none() {

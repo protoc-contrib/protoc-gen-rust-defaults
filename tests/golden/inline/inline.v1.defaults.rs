@@ -2,7 +2,7 @@
 #[allow(unused_imports, clippy::wildcard_imports)]
 use super::*;
 impl ListBooksRequest {
-    /// Fills each unset field of `inline.v1.ListBooksRequest` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `inline.v1.ListBooksRequest` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -13,7 +13,7 @@ impl ListBooksRequest {
     }
 }
 impl Shelf {
-    /// Fills each unset field of `inline.v1.Shelf` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `inline.v1.Shelf` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]

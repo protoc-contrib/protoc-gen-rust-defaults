@@ -6,10 +6,10 @@ syntax = "proto3";
 
 package inline.v1;
 
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 
 message ListBooksRequest {
-  int32 page_size = 1 [(protoc_contrib.defaults.value).int32 = 50];
+  int32 page_size = 1 [(protoc.contrib.defaults.value).int32 = 50];
   string page_token = 2;
 }
 
@@ -19,12 +19,12 @@ message Shelf {
     KIND_TALL = 1;
   }
 
-  Kind kind = 1 [(protoc_contrib.defaults.value).enum_name = "KIND_TALL"];
-  ListBooksRequest request = 2 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+  Kind kind = 1 [(protoc.contrib.defaults.value).enum_name = "KIND_TALL"];
+  ListBooksRequest request = 2 [(protoc.contrib.defaults.value).message = {initialize: true, recurse: true}];
 
   oneof placement {
-    option (protoc_contrib.defaults.oneof) = "wall";
-    string wall = 3 [(protoc_contrib.defaults.value).string = "north"];
+    option (protoc.contrib.defaults.oneof) = "wall";
+    string wall = 3 [(protoc.contrib.defaults.value).string = "north"];
     string floor = 4;
   }
 }

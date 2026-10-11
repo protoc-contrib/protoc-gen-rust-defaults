@@ -1,5 +1,5 @@
 //! The two option values that are strings standing for something else:
-//! `(protoc_contrib.defaults.value).duration` and `.timestamp`.
+//! `(protoc.contrib.defaults.value).duration` and `.timestamp`.
 //!
 //! Both are parsed here, at generation time, into the seconds and nanoseconds
 //! the generated code assigns — so a malformed literal fails `buf generate`

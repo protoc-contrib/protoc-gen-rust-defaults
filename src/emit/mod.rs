@@ -142,7 +142,7 @@ fn message_tokens(message: &Message) -> Result<TokenStream> {
         Method::SetDefaults => {
             let docs = doc(&format!(
                 "Fills each unset field of `{fqn}` with its \
-                 `(protoc_contrib.defaults.value)`.\n\n\
+                 `(protoc.contrib.defaults.value)`.\n\n\
                  A field that is already set is left as it is."
             ));
             quote! {
@@ -158,9 +158,9 @@ fn message_tokens(message: &Message) -> Result<TokenStream> {
         Method::ApplyDefaults => {
             let docs = doc(&format!(
                 "Fills each unset field of `{fqn}` with its \
-                 `(protoc_contrib.defaults.value)`.\n\n\
+                 `(protoc.contrib.defaults.value)`.\n\n\
                  Generated in place of `set_defaults`, because the message is \
-                 `(protoc_contrib.defaults.unexported)`: a hand-written \
+                 `(protoc.contrib.defaults.unexported)`: a hand-written \
                  `set_defaults` calls this and adds its own logic."
             ));
             quote! {

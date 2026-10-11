@@ -9,18 +9,19 @@
 
 A protoc plugin that generates `set_defaults(&mut self)` for the owned message
 types [buffa](https://github.com/anthropics/buffa) generates, from
-`protoc_contrib.defaults` annotations.
+`protoc.contrib.defaults` annotations.
 
 The Rust counterpart of
 [protoc-gen-go-defaults](https://github.com/protoc-contrib/protoc-gen-go-defaults).
-It reads the **same** `protoc_contrib/defaults/options.proto`, so a schema
+Both read the **same** options, `protoc/contrib/defaults/options.proto` from
+[protoc-types](https://github.com/protoc-contrib/protoc-types), so a schema
 shared by a Go and a Rust service declares its defaults once:
 
 ```proto
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 
 message ListBooksRequest {
-  int32 page_size = 1 [(protoc_contrib.defaults.value).int32 = 50];
+  int32 page_size = 1 [(protoc.contrib.defaults.value).int32 = 50];
 }
 ```
 
@@ -42,8 +43,8 @@ with explicit presence, and proto3 rejects `default` outright. Its
 
 ## What it generates
 
-For each message with a `(protoc_contrib.defaults.value)` on a field or a
-`(protoc_contrib.defaults.oneof)` on a oneof:
+For each message with a `(protoc.contrib.defaults.value)` on a field or a
+`(protoc.contrib.defaults.oneof)` on a oneof:
 
 ```rust
 impl ListBooksRequest {
@@ -61,10 +62,10 @@ without annotations gets nothing, and a package without them gets no file.
 
 | Extension | On | Generates |
 | --- | --- | --- |
-| `(protoc_contrib.defaults.value)` | a field | Fills the field if it is unset |
-| `(protoc_contrib.defaults.oneof)` | a oneof | Sets the named arm, with its own default, if the oneof is unset |
-| `(protoc_contrib.defaults.skip)` | a message | Nothing; a hand-written `set_defaults` takes its place |
-| `(protoc_contrib.defaults.unexported)` | a message | `pub(crate) fn apply_defaults` instead, for a hand-written `set_defaults` to call |
+| `(protoc.contrib.defaults.value)` | a field | Fills the field if it is unset |
+| `(protoc.contrib.defaults.oneof)` | a oneof | Sets the named arm, with its own default, if the oneof is unset |
+| `(protoc.contrib.defaults.skip)` | a message | Nothing; a hand-written `set_defaults` takes its place |
+| `(protoc.contrib.defaults.unexported)` | a message | `pub(crate) fn apply_defaults` instead, for a hand-written `set_defaults` to call |
 
 ### Value kinds
 
@@ -126,9 +127,9 @@ generated body, as Go's `SetDefaults() { x._SetDefaults() }` pattern does:
 
 ```proto
 message CreateBookRequest {
-  option (protoc_contrib.defaults.unexported) = true;
+  option (protoc.contrib.defaults.unexported) = true;
   string book_id = 1;
-  int32 copies = 2 [(protoc_contrib.defaults.value).int32 = 1];
+  int32 copies = 2 [(protoc.contrib.defaults.value).int32 = 1];
 }
 ```
 
@@ -169,13 +170,13 @@ or build it from GitHub:
 cargo install --git https://github.com/protoc-contrib/protoc-gen-rust-defaults protoc-gen-rust-defaults
 ```
 
-The annotations come from protoc-gen-go-defaults' BSR module, so the schema
-depends on it there:
+The options come from protoc-types' BSR module, so the schema depends on it
+there:
 
 ```yaml
 # buf.yaml
 deps:
-  - buf.build/protoc-contrib/protoc-gen-go-defaults
+  - buf.build/protoc-contrib/protoc-types
 ```
 
 Run it as a **local** plugin with `strategy: all`:
@@ -238,26 +239,15 @@ plugin names is then named where buffa put it:
 Well-known types need none. They resolve to `buffa-types` here, the same as
 in buffa.
 
-### The `protoc-contrib` crate
+### Reading the options yourself
 
-`protoc_contrib/` holds the Rust side of the `protoc_contrib.*` proto
-packages, one module per package, beside their `.proto` files.
-`protoc_contrib::defaults` is the counterpart of protoc-gen-go-defaults'
-`protoc_contrib/defaults` Go package, built from
-`protoc_contrib/defaults/options.proto`. It holds the options compiled for
-buffa: `FieldDefaults`, `MessageDefaults`, and the `VALUE`, `ONEOF`, `SKIP`
-and `UNEXPORTED` extensions, for reading the annotations off a descriptor. The
-plugin reads them through these too. The generated code is committed, so
-depending on the crate needs no `protoc`.
-
-The generated code doesn't need the crate. It isn't on crates.io either, so
-to read the annotations yourself, take it from GitHub, pinned to the release
-tag of the plugin you generate with:
-
-```toml
-[dependencies]
-protoc-contrib = { git = "https://github.com/protoc-contrib/protoc-gen-rust-defaults", tag = "vX.Y.Z" }
-```
+The plugin reads the annotations through the
+[`protoc-types`](https://github.com/protoc-contrib/protoc-types) crate, at
+`protoc_types::contrib::defaults`: `FieldDefaults`, `MessageDefaults`, and the
+`VALUE`, `ONEOF`, `SKIP` and `UNEXPORTED` extensions. The generated code
+doesn't need it. To read the annotations off a descriptor yourself, take it
+from GitHub pinned to the same `rev` as this repository's `Cargo.toml`, so you
+and the plugin agree on what an annotation says.
 
 ### Nix
 
@@ -292,14 +282,9 @@ code, so a change to its shape shows up in review. Regenerate it with:
 UPDATE_GOLDEN=1 cargo test -p defaults-fixture --test golden
 ```
 
-`protoc_contrib/src/defaults/generated` is buffa's output for
-`protoc_contrib/defaults/options.proto`, and a test fails if it drifts from a
-fresh generation. After changing the proto or the buffa version, regenerate it
-with:
-
-```bash
-UPDATE_GENERATED=1 cargo test -p protoc-contrib --test generated
-```
+The schema imports `options.proto` from the protoc-types checkout Cargo
+fetched for the plugin, so it is compiled against the rev `Cargo.lock` pins.
+To move to newer options, bump that `rev` in `Cargo.toml`.
 
 ## License
 

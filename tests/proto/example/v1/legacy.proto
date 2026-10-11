@@ -6,7 +6,7 @@ syntax = "proto2";
 
 package example.v1;
 
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 
 message Legacy {
   enum Level {
@@ -15,11 +15,11 @@ message Legacy {
     HIGH = 2;
   }
 
-  optional int32 retries = 1 [(protoc_contrib.defaults.value).int32 = 3];
-  optional string region = 2 [(protoc_contrib.defaults.value).string = "us-east1"];
-  optional bytes token = 3 [(protoc_contrib.defaults.value).bytes = "abc"];
-  optional Level level = 4 [(protoc_contrib.defaults.value).enum_name = "MEDIUM"];
-  required uint64 budget = 5 [(protoc_contrib.defaults.value).uint64 = 1000000];
-  required Level floor = 6 [(protoc_contrib.defaults.value).enum = 2];
-  optional double ratio = 7 [(protoc_contrib.defaults.value).double = 0.5];
+  optional int32 retries = 1 [(protoc.contrib.defaults.value).int32 = 3];
+  optional string region = 2 [(protoc.contrib.defaults.value).string = "us-east1"];
+  optional bytes token = 3 [(protoc.contrib.defaults.value).bytes = "abc"];
+  optional Level level = 4 [(protoc.contrib.defaults.value).enum_name = "MEDIUM"];
+  required uint64 budget = 5 [(protoc.contrib.defaults.value).uint64 = 1000000];
+  required Level floor = 6 [(protoc.contrib.defaults.value).enum = 2];
+  optional double ratio = 7 [(protoc.contrib.defaults.value).double = 0.5];
 }
