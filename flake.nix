@@ -41,8 +41,9 @@
 
           cargoLock = {
             lockFile = ./Cargo.lock;
-            # Git dependencies are fetched outside the lock's checksums; bump
-            # this with the protoc-types rev in Cargo.toml.
+            # Git dependencies are fetched outside the lock's checksums. CI's
+            # hash job repairs this on a Dependabot bump of the protoc-types
+            # rev; bump it by hand with a manual one.
             outputHashes."protoc-types-0.1.0" = "sha256-GxQqPTfFZallZ+acrWVJCIFJgGQsgtzhcc1Q0xfYuAw=";
           };
 
