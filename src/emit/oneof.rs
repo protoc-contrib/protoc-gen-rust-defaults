@@ -1,6 +1,6 @@
 //! The statements that default a oneof.
 //!
-//! A oneof that is unset is set to the arm `(protoc_contrib.defaults.oneof)`
+//! A oneof that is unset is set to the arm `(protoc.contrib.defaults.oneof)`
 //! names, holding that arm's own default if it has one. Then whichever arm is
 //! active, the caller's or the one just set, has its `set_defaults` called if
 //! it is a message arm annotated `recurse`.

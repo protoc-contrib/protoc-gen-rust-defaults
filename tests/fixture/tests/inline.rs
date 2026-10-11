@@ -1,6 +1,5 @@
 //! Defaults included into buffa's own module for their package
-//! (`packaging=false`), the way grpc-rust-template mounts them, as inherent
-//! methods with no trait (no `impl_trait`).
+//! (`packaging=false`), the way grpc-rust-template mounts them.
 
 use buffa::EnumValue;
 use defaults_fixture::inline::v1::{ListBooksRequest, Shelf, shelf};

@@ -126,8 +126,8 @@ dependencies = [
  "buffa-codegen",
  "buffa-descriptor",
  "buffa-types",
- "protoc-contrib",
  "protoc-gen-rust-defaults",
+ "serde_json",
 ]
 
 [[package]]
@@ -330,14 +330,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "protoc-contrib"
-version = "0.2.0"
-dependencies = [
- "buffa",
- "buffa-build",
-]
-
-[[package]]
 name = "protoc-gen-rust-defaults"
 version = "0.2.0"
 dependencies = [
@@ -347,9 +339,17 @@ dependencies = [
  "chrono",
  "prettyplease 0.3.0",
  "proc-macro2",
- "protoc-contrib",
+ "protoc-types",
  "quote",
  "syn 3.0.7",
+]
+
+[[package]]
+name = "protoc-types"
+version = "0.1.0"
+source = "git+https://github.com/protoc-contrib/protoc-types?rev=503f30cc10e81bcfdf3bc47923a097e20431fb74#503f30cc10e81bcfdf3bc47923a097e20431fb74"
+dependencies = [
+ "buffa",
 ]
 
 [[package]]

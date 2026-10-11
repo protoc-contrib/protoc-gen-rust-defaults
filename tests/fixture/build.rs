@@ -8,13 +8,14 @@
 //! runs.
 //!
 //! The schema is generated in both of the ways a consumer can mount it: the
-//! main schema as a module tree of its own (`packaging=true`) implementing
-//! `protoc_contrib::defaults::SetDefaults` (`impl_trait`), and the `inline.v1`
-//! package included into
-//! buffa's own module for it (`packaging=false`) with inherent methods only,
-//! the way grpc-rust-template does.
+//! main schema as a module tree of its own (`packaging=true`), and the
+//! `inline.v1` package included into buffa's own module for it
+//! (`packaging=false`), the way grpc-rust-template does.
 
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use anyhow::{Context, Result, bail};
 use buffa::Message;
@@ -55,10 +56,7 @@ fn main() -> Result<()> {
         .parent()
         .context("tests/ sits under the plugin root")?;
     let schema_root = tests.join("proto");
-    // The options proto the schema imports lives at
-    // `<repo>/protoc_contrib/defaults/options.proto`, so the repository root
-    // is its include root, as in protoc-gen-go-defaults.
-    let includes = [path(&schema_root), path(plugin)];
+    let includes = [path(&schema_root), path(&protoc_types_protos(plugin)?)];
     let includes: Vec<&str> = includes.iter().map(String::as_str).collect();
 
     for file in SCHEMA.iter().chain(INLINE) {
@@ -74,12 +72,7 @@ fn main() -> Result<()> {
         &includes,
         SCHEMA,
         &out.join("tree"),
-        &emit::Options {
-            proto_module: "crate::proto".to_owned(),
-            packaging: true,
-            extern_paths: Vec::new(),
-            impl_trait: Some("::protoc_contrib::defaults::SetDefaults".to_owned()),
-        },
+        &emit::Options::default(),
     )?;
     generate(
         &schema_root,
@@ -115,7 +108,7 @@ fn generate(
         .includes(includes)
         .out_dir(&proto)
         // The options are read by the plugin, not used as field types.
-        .exclude_package("protoc_contrib.defaults")
+        .exclude_package("protoc.contrib.defaults")
         .exclude_package("google.protobuf")
         .generate_views(false)
         .include_file("_include.rs")
@@ -153,7 +146,7 @@ fn request(
 ) -> Result<CodeGeneratorRequest> {
     let descriptors = out.join("schema.bin");
     let protoc = std::env::var("PROTOC").unwrap_or_else(|_| "protoc".to_owned());
-    let mut command = std::process::Command::new(protoc);
+    let mut command = Command::new(protoc);
     command
         .arg("--include_imports")
         .arg(format!("--descriptor_set_out={}", descriptors.display()));
@@ -174,6 +167,44 @@ fn request(
         proto_file: set.file.into_iter().collect::<Vec<FileDescriptorProto>>(),
         ..Default::default()
     })
+}
+
+/// The `proto/` root of the protoc-types checkout the plugin reads its options
+/// through, where the schema's `protoc/contrib/defaults/options.proto` import
+/// resolves: the schema is compiled against the options the plugin was built
+/// with, at the rev `Cargo.lock` pins, rather than a copy that can drift.
+///
+/// Cargo tells a build script nothing about where a dependency's source is,
+/// so ask `cargo metadata`. Not `--offline`: it resolves the whole lockfile,
+/// optional dependencies no feature enables included, and those were never
+/// downloaded for this build.
+fn protoc_types_protos(plugin: &Path) -> Result<PathBuf> {
+    let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".to_owned());
+    let output = Command::new(cargo)
+        .args(["metadata", "--format-version=1", "--locked"])
+        .arg("--manifest-path")
+        .arg(plugin.join("Cargo.toml"))
+        .output()
+        .context("run cargo metadata")?;
+    if !output.status.success() {
+        bail!(
+            "cargo metadata: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    let metadata: serde_json::Value = serde_json::from_slice(&output.stdout)?;
+    let manifest = metadata["packages"]
+        .as_array()
+        .context("cargo metadata lists packages")?
+        .iter()
+        .find(|package| package["name"] == "protoc-types")
+        .and_then(|package| package["manifest_path"].as_str())
+        .context("cargo metadata lists protoc-types")?;
+    Ok(Path::new(manifest)
+        .parent()
+        .context("a manifest sits in its package")?
+        .join("proto"))
 }
 
 fn path(path: &Path) -> String {

@@ -1,5 +1,5 @@
 //! Walks the messages of every file being generated and reads their
-//! `protoc_contrib.defaults` options into the [`Message`]s the emitter turns
+//! `protoc.contrib.defaults` options into the [`Message`]s the emitter turns
 //! into `set_defaults` methods.
 //!
 //! Every message is checked, including the ones that end up with no method --
@@ -25,7 +25,7 @@ use buffa_codegen::{
 
 use crate::check::{self, Value};
 use crate::presence::Scope;
-use protoc_contrib::defaults::{ONEOF, SKIP, UNEXPORTED, VALUE};
+use protoc_types::contrib::defaults::{ONEOF, SKIP, UNEXPORTED, VALUE};
 
 /// A message that gets a generated method.
 #[derive(Debug)]
@@ -46,10 +46,9 @@ pub struct Message {
 /// The method a message's defaults are emitted as.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
-    /// `pub fn set_defaults`, and the `impl_trait` impl calling it if one is
-    /// asked for.
+    /// `pub fn set_defaults`.
     SetDefaults,
-    /// `(protoc_contrib.defaults.unexported)`: only `pub(crate) fn
+    /// `(protoc.contrib.defaults.unexported)`: only `pub(crate) fn
     /// apply_defaults`, for a hand-written `set_defaults` to wrap.
     ApplyDefaults,
 }
@@ -90,7 +89,7 @@ pub struct Oneof {
     pub name: String,
     /// The Rust path of buffa's enum for it, from the package module.
     pub path: String,
-    /// The arm `(protoc_contrib.defaults.oneof)` names, set when the oneof is.
+    /// The arm `(protoc.contrib.defaults.oneof)` names, set when the oneof is.
     pub default: Option<Arm>,
     /// The proto names of the message arms whose `set_defaults` is called
     /// when active.
@@ -456,7 +455,9 @@ fn real_oneof(field: &FieldDescriptorProto) -> Option<i32> {
     field.oneof_index
 }
 
-fn field_defaults(field: &FieldDescriptorProto) -> Option<protoc_contrib::defaults::FieldDefaults> {
+fn field_defaults(
+    field: &FieldDescriptorProto,
+) -> Option<protoc_types::contrib::defaults::FieldDefaults> {
     field
         .options
         .as_option()
@@ -530,7 +531,7 @@ mod tests {
         EnumValueDescriptorProto, FieldOptions, FileDescriptorProto, MessageOptions,
         OneofDescriptorProto, OneofOptions, field_descriptor_proto::Label,
     };
-    use protoc_contrib::defaults::{
+    use protoc_types::contrib::defaults::{
         FieldDefaults, MessageDefaults, field_defaults::Type as Default,
     };
 

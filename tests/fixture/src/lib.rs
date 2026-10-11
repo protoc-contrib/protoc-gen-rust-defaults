@@ -9,8 +9,6 @@
 //! schema's `skip` and `unexported` messages ask for in place of generated
 //! ones.
 
-use protoc_contrib::defaults::SetDefaults;
-
 /// The buffa-generated message types.
 pub mod proto {
     #![allow(
@@ -24,15 +22,13 @@ pub mod proto {
 }
 
 /// The `set_defaults` methods this plugin emits for that schema, in a module
-/// tree of their own (`packaging=true`), each with an impl of
-/// [`SetDefaults`].
+/// tree of their own (`packaging=true`).
 pub mod defaults {
     include!(concat!(env!("OUT_DIR"), "/tree/defaults/mod.rs"));
 }
 
 /// A package whose defaults are included into buffa's own module for it
-/// (`packaging=false`), as grpc-rust-template mounts them: inherent methods,
-/// no trait.
+/// (`packaging=false`), as grpc-rust-template mounts them.
 pub mod inline {
     pub mod v1 {
         #![allow(
@@ -58,14 +54,6 @@ impl proto::example::v1::Draft {
         if self.slug.is_empty() {
             self.slug = self.title.to_lowercase().replace(' ', "-");
         }
-    }
-}
-
-/// `impl_trait` skips an `unexported` message, whose trait impl is as
-/// hand-written as its method.
-impl SetDefaults for proto::example::v1::Draft {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 

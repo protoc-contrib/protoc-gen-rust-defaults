@@ -2,7 +2,7 @@
 #[allow(unused_imports, clippy::wildcard_imports)]
 use super::*;
 impl Legacy {
-    /// Fills each unset field of `example.v1.Legacy` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Legacy` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -30,13 +30,8 @@ impl Legacy {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Legacy {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Edition {
-    /// Fills each unset field of `example.v1.Edition` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Edition` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -60,13 +55,8 @@ impl Edition {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Edition {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Outer {
-    /// Fills each unset field of `example.v1.Outer` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Outer` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -81,13 +71,8 @@ impl Outer {
         self.plain.get_or_insert_default();
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Outer {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl outer::Inner {
-    /// Fills each unset field of `example.v1.Outer.Inner` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Outer.Inner` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -102,13 +87,8 @@ impl outer::Inner {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for outer::Inner {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Type {
-    /// Fills each unset field of `example.v1.Type` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Type` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -118,15 +98,10 @@ impl Type {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Type {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Draft {
-    /// Fills each unset field of `example.v1.Draft` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Draft` with its `(protoc.contrib.defaults.value)`.
     ///
-    /// Generated in place of `set_defaults`, because the message is `(protoc_contrib.defaults.unexported)`: a hand-written `set_defaults` calls this and adds its own logic.
+    /// Generated in place of `set_defaults`, because the message is `(protoc.contrib.defaults.unexported)`: a hand-written `set_defaults` calls this and adds its own logic.
     #[allow(clippy::too_many_lines)]
     pub(crate) fn apply_defaults(&mut self) {
         if self.title.is_empty() {
@@ -135,7 +110,7 @@ impl Draft {
     }
 }
 impl Envelope {
-    /// Fills each unset field of `example.v1.Envelope` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `example.v1.Envelope` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines, clippy::default_trait_access)]
@@ -201,10 +176,5 @@ impl Envelope {
         if self.tiny.to_bits() == 0 {
             self.tiny = 1e-300f64;
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Envelope {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }

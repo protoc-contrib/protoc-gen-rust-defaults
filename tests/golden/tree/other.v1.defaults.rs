@@ -2,7 +2,7 @@
 #[allow(unused_imports, clippy::wildcard_imports)]
 use super::*;
 impl Shelf {
-    /// Fills each unset field of `other.v1.Shelf` with its `(protoc_contrib.defaults.value)`.
+    /// Fills each unset field of `other.v1.Shelf` with its `(protoc.contrib.defaults.value)`.
     ///
     /// A field that is already set is left as it is.
     #[allow(clippy::too_many_lines)]
@@ -13,10 +13,5 @@ impl Shelf {
         if self.tier.to_i32() == 0 {
             self.tier = ::buffa::EnumValue::Known(Tier::TIER_SILVER);
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Shelf {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }

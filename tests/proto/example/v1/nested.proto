@@ -6,7 +6,7 @@ syntax = "proto3";
 
 package example.v1;
 
-import "protoc_contrib/defaults/options.proto";
+import "protoc/contrib/defaults/options.proto";
 import "other/v1/catalog.proto";
 
 message Outer {
@@ -17,21 +17,21 @@ message Outer {
       COLOR_BLUE = 2;
     }
 
-    Color color = 1 [(protoc_contrib.defaults.value).enum_name = "COLOR_BLUE"];
+    Color color = 1 [(protoc.contrib.defaults.value).enum_name = "COLOR_BLUE"];
 
     oneof choice {
-      option (protoc_contrib.defaults.oneof) = "label";
-      string label = 2 [(protoc_contrib.defaults.value).string = "inner"];
+      option (protoc.contrib.defaults.oneof) = "label";
+      string label = 2 [(protoc.contrib.defaults.value).string = "inner"];
       int32 count = 3;
     }
   }
 
-  Inner inner = 1 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
-  other.v1.Tier tier = 2 [(protoc_contrib.defaults.value).enum_name = "TIER_GOLD"];
-  other.v1.Shelf shelf = 3 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+  Inner inner = 1 [(protoc.contrib.defaults.value).message = {initialize: true, recurse: true}];
+  other.v1.Tier tier = 2 [(protoc.contrib.defaults.value).enum_name = "TIER_GOLD"];
+  other.v1.Shelf shelf = 3 [(protoc.contrib.defaults.value).message = {initialize: true, recurse: true}];
   // Has no defaults, so there is no `set_defaults` to recurse into: it is
   // initialized and left at that.
-  other.v1.Plain plain = 4 [(protoc_contrib.defaults.value).message = {initialize: true, recurse: true}];
+  other.v1.Plain plain = 4 [(protoc.contrib.defaults.value).message = {initialize: true, recurse: true}];
   repeated Inner inners = 5;
 }
 
@@ -39,8 +39,8 @@ message Outer {
 // keyword.
 message Type {
   oneof kind {
-    option (protoc_contrib.defaults.oneof) = "type";
+    option (protoc.contrib.defaults.oneof) = "type";
     string name = 1;
-    int64 type = 2 [(protoc_contrib.defaults.value).int64 = 5];
+    int64 type = 2 [(protoc.contrib.defaults.value).int64 = 5];
   }
 }

@@ -1,5 +1,5 @@
 {
-  description = "protoc-gen-rust-defaults - A protoc plugin that emits set_defaults() for buffa messages from protoc_contrib.defaults annotations";
+  description = "protoc-gen-rust-defaults - A protoc plugin that emits set_defaults() for buffa messages from protoc.contrib.defaults annotations";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -39,11 +39,17 @@
           src = pkgs.lib.cleanSource ./.;
           doCheck = false;
 
-          cargoLock.lockFile = ./Cargo.lock;
+          cargoLock = {
+            lockFile = ./Cargo.lock;
+            # Git dependencies are fetched outside the lock's checksums. CI's
+            # hash job repairs this on a Dependabot bump of the protoc-types
+            # rev; bump it by hand with a manual one.
+            outputHashes."protoc-types-0.1.0" = "sha256-GxQqPTfFZallZ+acrWVJCIFJgGQsgtzhcc1Q0xfYuAw=";
+          };
 
-          # Only the plugin, and the protoc-contrib crate it reads the
-          # options through, whose generated code is committed: building needs
-          # no protoc. The fixture exists to regenerate and type-check the test
+          # Only the plugin, and the protoc-types crate it reads the options
+          # through, whose generated code is committed: building needs no
+          # protoc. The fixture exists to regenerate and type-check the test
           # schema and has no place in the binary being shipped.
           cargoBuildFlags = [
             "--package"
@@ -73,9 +79,7 @@
 
         devShells.default = pkgs.mkShell {
           inherit (manifest) name;
-          # protoc for the tests: the fixture compiles the test schema, and
-          # protoc-contrib checks its committed code against a fresh
-          # generation.
+          # protoc for the tests: the fixture compiles the test schema.
           packages = [
             rust-toolchain
             pkgs.protobuf

@@ -53,18 +53,6 @@ pub struct Options {
     /// is named where buffa put it. Well-known types need none; they resolve to
     /// `buffa-types` as they do in buffa.
     pub extern_paths: Vec<(String, String)>,
-
-    /// A trait with a `fn set_defaults(&mut self)` to implement for every
-    /// message that gets a generated `set_defaults`, by calling it.
-    ///
-    /// Unset by default, and then the output is inherent methods and nothing
-    /// else: no dependency, and nothing a consumer has to name. Set it to code
-    /// against messages generically -- an interceptor that defaults whatever
-    /// request it is handed -- with a trait the consumer owns.
-    ///
-    /// An `unexported` message gets no impl, since its `set_defaults` is the
-    /// hand-written one and so is its impl of the trait.
-    pub impl_trait: Option<String>,
 }
 
 impl Default for Options {
@@ -73,7 +61,6 @@ impl Default for Options {
             proto_module: "crate::proto".to_owned(),
             packaging: true,
             extern_paths: Vec::new(),
-            impl_trait: None,
         }
     }
 }
@@ -88,18 +75,8 @@ impl Default for Options {
 /// # Errors
 ///
 /// If emitted tokens do not parse as Rust -- which is a bug in this crate,
-/// reported with the tokens -- or if `proto_module` or `impl_trait` is not a
-/// Rust path.
+/// reported with the tokens -- or if `proto_module` is not a Rust path.
 pub fn render(messages: &[Message], options: &Options) -> Result<Vec<File>> {
-    let impl_trait = options
-        .impl_trait
-        .as_deref()
-        .map(|path| {
-            syn::parse_str::<syn::Path>(path)
-                .with_context(|| format!("impl_trait {path:?} is not a Rust path"))
-        })
-        .transpose()?;
-
     // Proto package to its messages' methods, in the order they were
     // gathered, so the output is stable across runs.
     let mut by_package: BTreeMap<&str, Vec<TokenStream>> = BTreeMap::new();
@@ -107,7 +84,7 @@ pub fn render(messages: &[Message], options: &Options) -> Result<Vec<File>> {
         by_package
             .entry(message.package.as_str())
             .or_default()
-            .push(message_tokens(message, impl_trait.as_ref())?);
+            .push(message_tokens(message)?);
     }
 
     let mut files = Vec::new();
@@ -138,9 +115,8 @@ pub fn render(messages: &[Message], options: &Options) -> Result<Vec<File>> {
     Ok(files)
 }
 
-/// The inherent method for `message`, and for an exported one an impl of
-/// `impl_trait`, if given, that calls it.
-fn message_tokens(message: &Message, impl_trait: Option<&syn::Path>) -> Result<TokenStream> {
+/// The inherent method for `message`.
+fn message_tokens(message: &Message) -> Result<TokenStream> {
     let path = parse_path(&message.path)?;
     let mut body = Vec::new();
     for item in &message.items {
@@ -166,20 +142,9 @@ fn message_tokens(message: &Message, impl_trait: Option<&syn::Path>) -> Result<T
         Method::SetDefaults => {
             let docs = doc(&format!(
                 "Fills each unset field of `{fqn}` with its \
-                 `(protoc_contrib.defaults.value)`.\n\n\
+                 `(protoc.contrib.defaults.value)`.\n\n\
                  A field that is already set is left as it is."
             ));
-            // `Self::set_defaults` names the inherent method, which takes
-            // precedence over the trait's of the same name.
-            let impl_trait = impl_trait.map(|impl_trait| {
-                quote! {
-                    impl #impl_trait for #path {
-                        fn set_defaults(&mut self) {
-                            Self::set_defaults(self);
-                        }
-                    }
-                }
-            });
             quote! {
                 impl #path {
                     #docs
@@ -188,15 +153,14 @@ fn message_tokens(message: &Message, impl_trait: Option<&syn::Path>) -> Result<T
                         #( #body )*
                     }
                 }
-                #impl_trait
             }
         }
         Method::ApplyDefaults => {
             let docs = doc(&format!(
                 "Fills each unset field of `{fqn}` with its \
-                 `(protoc_contrib.defaults.value)`.\n\n\
+                 `(protoc.contrib.defaults.value)`.\n\n\
                  Generated in place of `set_defaults`, because the message is \
-                 `(protoc_contrib.defaults.unexported)`: a hand-written \
+                 `(protoc.contrib.defaults.unexported)`: a hand-written \
                  `set_defaults` calls this and adds its own logic."
             ));
             quote! {
