@@ -3,7 +3,7 @@ name = "protoc-contrib"
 version = "0.2.0"
 edition = "2024"
 license = "MIT"
-description = "The protoc_contrib proto packages for buffa: the defaults options, and the SetDefaults trait protoc-gen-rust-defaults can implement."
+description = "The protoc_contrib proto packages for buffa: the defaults options protoc-gen-rust-defaults reads."
 repository = "https://github.com/protoc-contrib/protoc-gen-rust-defaults"
 # Taken from GitHub, not crates.io: the Rust side of the `protoc_contrib/*` Go
 # packages, living beside the plugin as protoc-gen-go-defaults' does.

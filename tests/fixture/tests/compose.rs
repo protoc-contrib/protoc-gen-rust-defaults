@@ -1,28 +1,13 @@
-//! Generated defaults composed with hand-written ones, reached generically
-//! through `protoc_contrib::defaults::SetDefaults` (`impl_trait`), and oneofs
-//! whose default arm is a well-known type.
+//! Generated defaults composed with hand-written ones, and oneofs whose
+//! default arm is a well-known type.
 
 use buffa::MessageField;
 use defaults_fixture::proto::example::v1::{Draft, Envelope, Frozen, envelope};
-use protoc_contrib::defaults::SetDefaults;
-
-/// What an interceptor does: apply the defaults of a message it knows only by
-/// its trait.
-fn apply<M: SetDefaults>(message: &mut M) {
-    message.set_defaults();
-}
-
-#[test]
-fn reaches_generated_defaults_through_the_trait() {
-    let mut envelope = Envelope::default();
-    apply(&mut envelope);
-    assert_eq!(envelope.negative, -5);
-}
 
 #[test]
 fn an_unexported_message_runs_the_generated_body_and_the_hand_written_one() {
     let mut draft = Draft::default();
-    apply(&mut draft);
+    draft.set_defaults();
     assert_eq!(draft.title, "untitled");
     assert_eq!(draft.slug, "untitled");
 
@@ -30,7 +15,7 @@ fn an_unexported_message_runs_the_generated_body_and_the_hand_written_one() {
         title: "Hello World".to_owned(),
         ..Default::default()
     };
-    apply(&mut draft);
+    draft.set_defaults();
     assert_eq!(draft.slug, "hello-world");
 }
 
@@ -98,6 +83,7 @@ fn leaves_a_oneof_the_caller_set_and_recurses_into_its_arm() {
 fn spells_literals_rust_has_no_plain_number_for() {
     let mut envelope = Envelope::default();
     envelope.set_defaults();
+    assert_eq!(envelope.negative, -5);
     assert!(envelope.not_a_number.is_nan());
     assert_eq!(envelope.big, u64::MAX);
     assert_eq!(envelope.quoted, "say \"hi\"\n");

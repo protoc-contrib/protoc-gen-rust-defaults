@@ -46,8 +46,7 @@ pub struct Message {
 /// The method a message's defaults are emitted as.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Method {
-    /// `pub fn set_defaults`, and the `impl_trait` impl calling it if one is
-    /// asked for.
+    /// `pub fn set_defaults`.
     SetDefaults,
     /// `(protoc_contrib.defaults.unexported)`: only `pub(crate) fn
     /// apply_defaults`, for a hand-written `set_defaults` to wrap.

@@ -126,7 +126,6 @@ dependencies = [
  "buffa-codegen",
  "buffa-descriptor",
  "buffa-types",
- "protoc-contrib",
  "protoc-gen-rust-defaults",
 ]
 

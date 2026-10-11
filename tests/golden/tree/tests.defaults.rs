@@ -123,11 +123,6 @@ impl Types {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Types {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Message {
     /// Fills each unset field of `tests.Message` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -137,11 +132,6 @@ impl Message {
         if self.field.is_empty() {
             self.field = "lonely field".into();
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Message {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 impl OneOfTwo {
@@ -155,11 +145,6 @@ impl OneOfTwo {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for OneOfTwo {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl OneOfThree {
     /// Fills each unset field of `tests.OneOfThree` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -169,11 +154,6 @@ impl OneOfThree {
         if self.string_field.is_empty() {
             self.string_field = "string_field".into();
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for OneOfThree {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 impl Test {
@@ -246,11 +226,6 @@ impl Test {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Test {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl TestOptional {
     /// Fills each unset field of `tests.TestOptional` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -271,11 +246,6 @@ impl TestOptional {
                 ::buffa::EnumValue::Known(test_optional::Type::TWO),
             );
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for TestOptional {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 impl TestUnexported {

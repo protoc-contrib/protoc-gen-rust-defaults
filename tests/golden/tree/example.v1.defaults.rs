@@ -30,11 +30,6 @@ impl Legacy {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Legacy {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Edition {
     /// Fills each unset field of `example.v1.Edition` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -60,11 +55,6 @@ impl Edition {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for Edition {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Outer {
     /// Fills each unset field of `example.v1.Outer` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -79,11 +69,6 @@ impl Outer {
         }
         self.shelf.get_or_insert_default().set_defaults();
         self.plain.get_or_insert_default();
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Outer {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 impl outer::Inner {
@@ -102,11 +87,6 @@ impl outer::Inner {
         }
     }
 }
-impl ::protoc_contrib::defaults::SetDefaults for outer::Inner {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
 impl Type {
     /// Fills each unset field of `example.v1.Type` with its `(protoc_contrib.defaults.value)`.
     ///
@@ -116,11 +96,6 @@ impl Type {
         if self.kind.is_none() {
             self.kind = ::core::option::Option::Some(r#type::Kind::Type(5i64));
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Type {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }
 impl Draft {
@@ -201,10 +176,5 @@ impl Envelope {
         if self.tiny.to_bits() == 0 {
             self.tiny = 1e-300f64;
         }
-    }
-}
-impl ::protoc_contrib::defaults::SetDefaults for Envelope {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
     }
 }

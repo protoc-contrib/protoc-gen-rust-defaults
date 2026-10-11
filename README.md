@@ -157,7 +157,6 @@ nothing, and the whole method is yours. Either way, write it as an
 | A zone abbreviation in a timestamp (`MST`) | resolved against the generating machine's local zone; an unknown one is read as UTC | the fixed offset RFC 822 gives it (`UT`, `GMT`, `Z`, `EST`…`PDT`); any other abbreviation is an error |
 | `float = nan` / `inf` | emits invalid Go | `f32::NAN`, `f32::INFINITY` |
 | Editions | unsupported | supported, with presence resolved per field |
-| Applying defaults to a message of unknown type | `defaults.Apply` / `ApplyAll`, by reflection | an impl of your own trait, with `impl_trait` |
 
 ## Wiring it up
 
@@ -226,37 +225,6 @@ replaces it. Types in other packages are reached with `super` hops, exactly as
 buffa reaches them, so the included file has to sit at the package's own
 position in buffa's tree.
 
-### Generic code: `impl_trait=<path>`
-
-Rust has no reflection that generic code could use to reach a message's
-defaults, which Go's `defaults.Apply` does. If you want an interceptor that
-defaults whatever request it's handed, point the plugin at a trait with a
-`fn set_defaults(&mut self)`. The [`protoc-contrib`
-crate](#the-protoc-contrib-crate) has one:
-
-```yaml
-    opt:
-      - impl_trait=::protoc_contrib::defaults::SetDefaults
-```
-
-Every generated `set_defaults` then also gets an impl of that trait,
-delegating to the inherent method:
-
-```rust
-impl ::protoc_contrib::defaults::SetDefaults for ListBooksRequest {
-    fn set_defaults(&mut self) {
-        Self::set_defaults(self);
-    }
-}
-```
-
-Any trait of the same shape works, so you can define your own instead.
-
-An `unexported` message gets no impl, since its method is yours and so is its
-impl. Without `impl_trait`, the output is inherent methods only. That's enough
-when callers know the concrete type, for example an interceptor that matches
-on the RPC and calls `ListBooksRequest::set_defaults`.
-
 ### `extern_path`
 
 If buffa runs with `extern_path`, pass the same entries here. An enum this
@@ -276,17 +244,15 @@ in buffa.
 packages, one module per package, beside their `.proto` files.
 `protoc_contrib::defaults` is the counterpart of protoc-gen-go-defaults'
 `protoc_contrib/defaults` Go package, built from
-`protoc_contrib/defaults/options.proto`, and it has two parts:
+`protoc_contrib/defaults/options.proto`. It holds the options compiled for
+buffa: `FieldDefaults`, `MessageDefaults`, and the `VALUE`, `ONEOF`, `SKIP`
+and `UNEXPORTED` extensions, for reading the annotations off a descriptor. The
+plugin reads them through these too. The generated code is committed, so
+depending on the crate needs no `protoc`.
 
-- **The options compiled for buffa:** `FieldDefaults`, `MessageDefaults`, and
-  the `VALUE`, `ONEOF`, `SKIP` and `UNEXPORTED` extensions, for reading the
-  annotations off a descriptor. The plugin reads them through these too. The
-  generated code is committed, so depending on the crate needs no `protoc`.
-- **`SetDefaults`:** the trait for `impl_trait`, with an impl for `Box<T>`.
-
-The generated code doesn't need the crate unless you use `impl_trait` with
-its trait. It isn't on crates.io either, so take it from GitHub, pinned to the
-release tag of the plugin that generated your code:
+The generated code doesn't need the crate. It isn't on crates.io either, so
+to read the annotations yourself, take it from GitHub, pinned to the release
+tag of the plugin you generate with:
 
 ```toml
 [dependencies]
