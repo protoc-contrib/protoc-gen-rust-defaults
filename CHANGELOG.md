@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.0](https://github.com/protoc-contrib/protoc-gen-rust-defaults/compare/v0.2.0...v0.3.0) (2026-10-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* the impl_trait plugin option and protoc_contrib::defaults::SetDefaults are removed. A buf.gen.yaml that still sets impl_trait keeps generating, since unknown options are ignored, but no trait impls are emitted.
+
+### Features
+
+* recurse into repeated and map message fields ([#9](https://github.com/protoc-contrib/protoc-gen-rust-defaults/issues/9)) ([4db5ae4](https://github.com/protoc-contrib/protoc-gen-rust-defaults/commit/4db5ae45efa8da4be78264a489de72dfd3ed5269))
+
+
+### Code Refactoring
+
+* read the options from protoc-types and drop impl_trait ([#7](https://github.com/protoc-contrib/protoc-gen-rust-defaults/issues/7)) ([4cbb1bc](https://github.com/protoc-contrib/protoc-gen-rust-defaults/commit/4cbb1bcb1e358a1ea959be913648e99209a487c5))
+
 ## [0.2.0](https://github.com/protoc-contrib/protoc-gen-rust-defaults/compare/v0.1.0...v0.2.0) (2026-10-10)
 
 
