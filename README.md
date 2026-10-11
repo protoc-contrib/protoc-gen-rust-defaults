@@ -82,7 +82,9 @@ its field fails `buf generate` instead of compiling to something else.
 | `timestamp` | `google.protobuf.Timestamp` | `"now"`, read when the defaults are applied; or RFC3339, RFC1123(Z), RFC850 or RFC822(Z), parsed at generation time. |
 | `message = {initialize, recurse}` | a message | `initialize` creates it if unset. `recurse` calls its `set_defaults`, if it is set or was just created. |
 
-Repeated and map fields are rejected, as they are in Go.
+A repeated or map field accepts only `message = {recurse: true}`, on message
+elements; see [Repeated and map fields](#repeated-and-map-fields). Anything
+else on one is rejected, as it is in Go.
 
 ### What "unset" means
 
@@ -117,6 +119,32 @@ the target:
 - **A message without annotations, or a foreign type** such as
   `google.protobuf.DescriptorProto`, has nothing to call. Recursion into it
   does nothing, as in Go. `initialize` still creates it.
+
+#### Repeated and map fields
+
+`message = {recurse: true}` is the only annotation a repeated or map field
+accepts, and only when its elements, or a map's values, are messages. It calls
+`set_defaults` on every one of them, under the same rules for the target as
+above. There is no single value to default and no element to create, so a
+scalar default or `initialize` fails generation, with Go's error messages.
+
+```proto
+message BatchCreateBooksRequest {
+  repeated CreateBookRequest requests = 1 [(protoc.contrib.defaults.value).message = {recurse: true}];
+  map<string, Profile> profiles = 2 [(protoc.contrib.defaults.value).message = {recurse: true}];
+}
+```
+
+```rust
+for message in &mut self.requests {
+    message.set_defaults();
+}
+for message in self.profiles.values_mut() {
+    message.set_defaults();
+}
+```
+
+buffa holds the elements by value, so there is no `nil` to skip as in Go.
 
 ### Composing with hand-written defaults
 

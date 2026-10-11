@@ -10,7 +10,8 @@
 
 use buffa::{EnumValue, MessageField};
 use defaults_fixture::proto::tests::{
-    OneOfOne, OneOfThree, OneOfTwo, Test, TestOptional, TestUnexported, Types, test, types,
+    NoDefaults, OneOfOne, OneOfThree, OneOfTwo, Test, TestOptional, TestUnexported, Types, test,
+    types,
 };
 
 fn unix_now() -> i64 {
@@ -165,6 +166,49 @@ fn recurses_into_a_set_message_field_without_initializing_an_unset_one() {
     test.set_defaults();
     assert_eq!(test.message_field.string_field, "string_field");
     assert_eq!(test.message_field.number_field, 42);
+}
+
+#[test]
+fn recurses_into_every_element_of_a_repeated_field() {
+    let mut test = Test {
+        repeated_test_field: vec![
+            Test::default(),
+            Test {
+                string_field: "set".to_owned(),
+                ..Default::default()
+            },
+        ],
+        ..Default::default()
+    };
+    test.set_defaults();
+    assert_eq!(test.repeated_test_field[0].string_field, "string_field");
+    assert_eq!(test.repeated_test_field[1].string_field, "set");
+    assert_eq!(test.repeated_test_field[1].number_field, 42);
+}
+
+#[test]
+fn recurses_into_every_value_of_a_map_through_its_hand_written_method() {
+    let mut test = Test {
+        map_one_field: [("set".to_owned(), OneOfOne::default())]
+            .into_iter()
+            .collect(),
+        ..Default::default()
+    };
+    test.set_defaults();
+    // `OneOfOne` is `skip`: its `set_defaults` is the fixture's.
+    assert_eq!(test.map_one_field["set"].string_field, "hand-written");
+}
+
+#[test]
+fn leaves_repeated_elements_without_defaults_alone() {
+    // `NoDefaults` has no `set_defaults`, so the recurse emits nothing --
+    // which compiling at all already shows.
+    let mut test = Test {
+        repeated_no_defaults_field: vec![NoDefaults::default()],
+        ..Default::default()
+    };
+    test.set_defaults();
+    assert_eq!(test.repeated_no_defaults_field, [NoDefaults::default()]);
 }
 
 #[test]

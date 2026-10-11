@@ -59,6 +59,9 @@ message Test {
 	google.protobuf.DescriptorProto descriptor = 17 [(protoc.contrib.defaults.value).message = {initialize: true, recurse: true}];
 	google.protobuf.Timestamp time_value_field_with_default = 18 [(protoc.contrib.defaults.value).timestamp = "1952-03-11T00:00:00Z"];
 	bytes bytes = 19 [(protoc.contrib.defaults.value).bytes = "??"];
+	repeated Test repeated_test_field = 20 [(protoc.contrib.defaults.value).message = {recurse: true}];
+	map<string, OneOfOne> map_one_field = 21 [(protoc.contrib.defaults.value).message = {recurse: true}];
+	repeated NoDefaults repeated_no_defaults_field = 22 [(protoc.contrib.defaults.value).message = {recurse: true}];
 }
 
 message TestOptional {
