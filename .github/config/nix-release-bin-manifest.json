@@ -1,13 +1,13 @@
 {
   "assets": {
     "aarch64-darwin": {
-      "hash": "sha256-kMXm4ul6hJf6wBpskr6st2g0srsBC7H8tludMhex3TA=",
-      "url": "https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases/download/v0.2.0/protoc-gen-rust-defaults-aarch64-darwin"
+      "hash": "sha256-TYCcBxgUc9+Peg4EzhPsSoRUqn6K5JVsXDJflhua5HE=",
+      "url": "https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases/download/v0.3.0/protoc-gen-rust-defaults-aarch64-darwin"
     },
     "x86_64-linux": {
-      "hash": "sha256-77bzkUjzEtAX2mSMg7FTC//M2ksB9xW5gn5T1kfEYaA=",
-      "url": "https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases/download/v0.2.0/protoc-gen-rust-defaults-x86_64-linux"
+      "hash": "sha256-ehZaphi08pLlEmayJFB9Bns+rH4kwET7uC1m9HVSYxw=",
+      "url": "https://github.com/protoc-contrib/protoc-gen-rust-defaults/releases/download/v0.3.0/protoc-gen-rust-defaults-x86_64-linux"
     }
   },
-  "version": "0.2.0"
+  "version": "0.3.0"
 }
