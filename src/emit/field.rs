@@ -8,7 +8,8 @@
 //!
 //! A `recurse` calls the nested message's inherent `set_defaults` with
 //! method-call syntax, which reaches through the `&mut` a `MessageField` lends
-//! and the `Box` a oneof arm holds alike, and needs no trait in scope.
+//! and the `Box` a oneof arm holds alike, and needs no trait in scope. On a
+//! repeated or map field it is called on every element, or every value.
 //!
 //! Concrete field types are never named. A string is assigned with `.into()`,
 //! and a message -- well-known or not -- is created and filled through
@@ -55,7 +56,27 @@ pub(super) fn emit(field: &Field) -> Result<TokenStream> {
             }
         }
         Shape::Message => message(&field.value, &place)?,
+        Shape::Repeated | Shape::Map => collection(field.shape, &field.value, &place),
     })
+}
+
+/// The statements that recurse into every element of a repeated field, or
+/// every value of a map. buffa holds them by value -- a `Vec<T>`, a map of
+/// `T` -- so unlike Go's nil pointers there is no absent element to step over.
+fn collection(shape: Shape, value: &Value, place: &TokenStream) -> TokenStream {
+    let Value::Message { recurse: true, .. } = value else {
+        return TokenStream::new();
+    };
+    let elements = if shape == Shape::Map {
+        quote! { #place.values_mut() }
+    } else {
+        quote! { &mut #place }
+    };
+    quote! {
+        for message in #elements {
+            message.set_defaults();
+        }
+    }
 }
 
 /// The statements that default a `MessageField`.

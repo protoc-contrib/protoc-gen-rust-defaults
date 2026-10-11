@@ -86,7 +86,7 @@ pub(crate) fn value(
         return Ok(None);
     };
     if field.label == Some(Label::LABEL_REPEATED) {
-        return Err("defaults are not supported on repeated or map fields".to_owned());
+        return collection(field, default, schema).map(Some);
     }
 
     if let Some(scalar) = scalar(default, field)? {
@@ -172,6 +172,41 @@ pub(crate) fn value(
         _ => return Ok(None),
     };
     Ok(Some(value))
+}
+
+/// Reads the annotation on a repeated or map field. Such a field has no single
+/// value to default and no element to create, so the only thing it accepts is
+/// a recurse into its message elements -- a map's values.
+fn collection(
+    field: &FieldDescriptorProto,
+    default: &field_defaults::Type,
+    schema: &Schema<'_>,
+) -> Result<Value, String> {
+    let field_defaults::Type::Message(message) = default else {
+        return Err(
+            "repeated and map fields only accept (defaults.value).message = {recurse: true}"
+                .to_owned(),
+        );
+    };
+    let element = element(field, schema)
+        .ok_or_else(|| "recurse on a repeated or map field requires message elements".to_owned())?;
+    if message.initialize.unwrap_or(false) {
+        return Err("initialize is not supported on repeated or map fields".to_owned());
+    }
+    Ok(Value::Message {
+        initialize: false,
+        recurse: message.recurse.unwrap_or(false) && schema.recurses_into(&element),
+    })
+}
+
+/// The message type of a repeated field's elements, or of a map field's
+/// values; `None` when they are not messages.
+fn element(field: &FieldDescriptorProto, schema: &Schema<'_>) -> Option<String> {
+    let element = message_type(field)?;
+    match schema.map_value(element) {
+        Some(value) => message_type(value).map(str::to_owned),
+        None => Some(element.to_owned()),
+    }
 }
 
 /// Reads a scalar default, checked against the field's kind -- or, for the

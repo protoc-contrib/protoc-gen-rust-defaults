@@ -224,6 +224,12 @@ impl Test {
         if self.bytes.is_empty() {
             self.bytes = b"??".as_slice().into();
         }
+        for message in &mut self.repeated_test_field {
+            message.set_defaults();
+        }
+        for message in self.map_one_field.values_mut() {
+            message.set_defaults();
+        }
     }
 }
 impl TestOptional {

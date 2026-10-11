@@ -18,7 +18,7 @@ use buffa_codegen::{
         compiler::CodeGeneratorRequest,
         descriptor::{
             DescriptorProto, EnumDescriptorProto, EnumValueDescriptorProto, FieldDescriptorProto,
-            field_descriptor_proto::Type,
+            field_descriptor_proto::{Label, Type},
         },
     },
 };
@@ -80,6 +80,12 @@ pub enum Shape {
     Optional,
     /// `MessageField<T>`. Unset is no message.
     Message,
+    /// A repeated message field, a `Vec<T>`: only ever recursed into, element
+    /// by element.
+    Repeated,
+    /// A map field with message values: only ever recursed into, value by
+    /// value.
+    Map,
 }
 
 /// A oneof with a default arm or arms to recurse into.
@@ -223,6 +229,21 @@ impl<'a> Schema<'a> {
         })
     }
 
+    /// The value field of the message `fqn`, when it is the entry message
+    /// protoc synthesizes for a map field: what the map's values are.
+    pub(crate) fn map_value(&self, fqn: &str) -> Option<&'a FieldDescriptorProto> {
+        let (message, _) = self.messages.get(fqn)?;
+        let entry = message
+            .options
+            .as_option()
+            .and_then(|options| options.map_entry)
+            .unwrap_or(false);
+        if !entry {
+            return None;
+        }
+        message.field.iter().find(|field| field.number == Some(2))
+    }
+
     fn package_of(&self, fqn: &str) -> Option<&'a str> {
         self.messages
             .get(fqn)
@@ -354,7 +375,14 @@ fn items(
         }
 
         if let Some(value) = value {
-            let shape = if field.r#type == Some(Type::TYPE_MESSAGE) {
+            let shape = if field.label == Some(Label::LABEL_REPEATED) {
+                let entry = field.type_name.as_deref().unwrap_or_default();
+                if schema.map_value(entry.trim_start_matches('.')).is_some() {
+                    Shape::Map
+                } else {
+                    Shape::Repeated
+                }
+            } else if field.r#type == Some(Type::TYPE_MESSAGE) {
                 Shape::Message
             } else if scope.is_option(field) {
                 Shape::Optional
@@ -529,7 +557,7 @@ mod tests {
     use super::*;
     use buffa_codegen::generated::descriptor::{
         EnumValueDescriptorProto, FieldOptions, FileDescriptorProto, MessageOptions,
-        OneofDescriptorProto, OneofOptions, field_descriptor_proto::Label,
+        OneofDescriptorProto, OneofOptions,
     };
     use protoc_types::contrib::defaults::{
         FieldDefaults, MessageDefaults, field_defaults::Type as Default,
@@ -717,17 +745,137 @@ mod tests {
         );
     }
 
+    fn repeated(mut field: FieldDescriptorProto) -> FieldDescriptorProto {
+        field.label = Some(Label::LABEL_REPEATED);
+        field
+    }
+
+    fn recurse(initialize: bool) -> Default {
+        Default::Message(Box::new(MessageDefaults {
+            initialize: Some(initialize),
+            recurse: Some(true),
+            ..MessageDefaults::default()
+        }))
+    }
+
+    /// `pkg.Msg`, holding `entries`, a `map<string, value>` of `kind` annotated
+    /// with `default`, and the entry message protoc synthesizes for it.
+    fn with_map(kind: Type, value: &str, default: Option<Default>) -> DescriptorProto {
+        let mut entry = message(
+            "EntriesEntry",
+            vec![
+                field("key", Type::TYPE_STRING, None),
+                typed(field("value", kind, None), value),
+            ],
+        );
+        entry.field[1].number = Some(2);
+        entry.options = MessageOptions {
+            map_entry: Some(true),
+            ..MessageOptions::default()
+        }
+        .into();
+        let mut msg = message(
+            "Msg",
+            vec![repeated(typed(
+                field("entries", Type::TYPE_MESSAGE, default),
+                ".pkg.Msg.EntriesEntry",
+            ))],
+        );
+        msg.nested_type = vec![entry];
+        msg
+    }
+
     #[test]
-    fn rejects_a_default_on_a_repeated_field() {
-        let mut repeated = field(
+    fn rejects_a_scalar_default_on_a_repeated_field() {
+        let names = repeated(field(
             "names",
             Type::TYPE_STRING,
             Some(Default::String("x".into())),
-        );
-        repeated.label = Some(Label::LABEL_REPEATED);
+        ));
         assert_eq!(
-            error(vec![message("Msg", vec![repeated])]),
-            "pkg.Msg: field names: defaults are not supported on repeated or map fields"
+            error(vec![message("Msg", vec![names])]),
+            "pkg.Msg: field names: repeated and map fields only accept (defaults.value).message = {recurse: true}"
+        );
+    }
+
+    #[test]
+    fn rejects_a_recurse_into_scalar_elements() {
+        let names = repeated(field("names", Type::TYPE_STRING, Some(recurse(false))));
+        assert_eq!(
+            error(vec![message("Msg", vec![names])]),
+            "pkg.Msg: field names: recurse on a repeated or map field requires message elements"
+        );
+        assert_eq!(
+            error(vec![with_map(
+                Type::TYPE_ENUM,
+                ".pkg.Color",
+                Some(recurse(false))
+            )]),
+            "pkg.Msg: field entries: recurse on a repeated or map field requires message elements"
+        );
+    }
+
+    #[test]
+    fn rejects_initialize_on_a_repeated_or_map_field() {
+        let items = repeated(typed(
+            field("items", Type::TYPE_MESSAGE, Some(recurse(true))),
+            ".pkg.Msg",
+        ));
+        assert_eq!(
+            error(vec![message("Msg", vec![items])]),
+            "pkg.Msg: field items: initialize is not supported on repeated or map fields"
+        );
+        assert_eq!(
+            error(vec![with_map(
+                Type::TYPE_MESSAGE,
+                ".pkg.Msg",
+                Some(recurse(true))
+            )]),
+            "pkg.Msg: field entries: initialize is not supported on repeated or map fields"
+        );
+    }
+
+    #[test]
+    fn recurses_into_repeated_and_map_elements_with_a_set_defaults_to_call() {
+        let with = message(
+            "With",
+            vec![field(
+                "name",
+                Type::TYPE_STRING,
+                Some(Default::String("x".into())),
+            )],
+        );
+        let without = message("Without", vec![field("name", Type::TYPE_STRING, None)]);
+        let mut msg = with_map(Type::TYPE_MESSAGE, ".pkg.With", Some(recurse(false)));
+        msg.field.push(repeated(typed(
+            field("withs", Type::TYPE_MESSAGE, Some(recurse(false))),
+            ".pkg.With",
+        )));
+        msg.field.push(repeated(typed(
+            field("withouts", Type::TYPE_MESSAGE, Some(recurse(false))),
+            ".pkg.Without",
+        )));
+        let messages = gather_file(vec![with, without, msg]).unwrap();
+        let msg = messages.iter().find(|m| m.fqn == "pkg.Msg").unwrap();
+        let fields: Vec<(&str, Shape, bool)> = msg
+            .items
+            .iter()
+            .map(|item| match item {
+                Item::Field(Field {
+                    name,
+                    shape,
+                    value: Value::Message { recurse, .. },
+                }) => (name.as_str(), *shape, *recurse),
+                other => panic!("unexpected {other:?}"),
+            })
+            .collect();
+        assert_eq!(
+            fields,
+            [
+                ("entries", Shape::Map, true),
+                ("withs", Shape::Repeated, true),
+                ("withouts", Shape::Repeated, false),
+            ]
         );
     }
 
