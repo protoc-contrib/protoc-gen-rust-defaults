@@ -31,7 +31,7 @@ pedantic = { level = "deny", priority = -1 }
 # consumer reads them with, so the plugin and its users cannot disagree on
 # what an annotation says. Pinned to a rev, as protoc-types asks: it has no
 # releases, and a branch would let the options change under this build.
-protoc-types = { git = "https://github.com/protoc-contrib/protoc-types", rev = "503f30cc10e81bcfdf3bc47923a097e20431fb74" }
+protoc-types = { git = "https://github.com/protoc-contrib/protoc-types", rev = "8d8b79e2761fb67ff7154e3c07c0fc79f176d12c" }
 # The descriptor and plugin-protocol types, and the type-path resolution the
 # generated code has to agree with. Pinned to the same minor as the buffa
 # codegen whose output this extends -- an enum or oneof named by a different
