@@ -44,7 +44,7 @@
             # Git dependencies are fetched outside the lock's checksums. CI's
             # hash job repairs this on a Dependabot bump of the protoc-types
             # rev; bump it by hand with a manual one.
-            outputHashes."protoc-types-0.1.0" = "sha256-GxQqPTfFZallZ+acrWVJCIFJgGQsgtzhcc1Q0xfYuAw=";
+            outputHashes."protoc-types-0.1.0" = "sha256-UOWEJ2HQgXksq7u8Tcv94lgU0diKk7dFmDaTqEa1jKQ=";
           };
 
           # Only the plugin, and the protoc-types crate it reads the options

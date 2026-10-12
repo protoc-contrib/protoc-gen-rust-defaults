@@ -127,7 +127,7 @@ dependencies = [
  "buffa-descriptor",
  "buffa-types",
  "protoc-gen-rust-defaults",
- "serde_json",
+ "protoc-types",
 ]
 
 [[package]]
@@ -347,7 +347,7 @@ dependencies = [
 [[package]]
 name = "protoc-types"
 version = "0.1.0"
-source = "git+https://github.com/protoc-contrib/protoc-types?rev=503f30cc10e81bcfdf3bc47923a097e20431fb74#503f30cc10e81bcfdf3bc47923a097e20431fb74"
+source = "git+https://github.com/protoc-contrib/protoc-types?rev=8d8b79e2761fb67ff7154e3c07c0fc79f176d12c#8d8b79e2761fb67ff7154e3c07c0fc79f176d12c"
 dependencies = [
  "buffa",
 ]
