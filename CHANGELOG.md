@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/protoc-contrib/protoc-gen-rust-defaults/compare/v0.3.0...v0.4.0) (2026-11-07)
+
+
+### Features
+
+* **ci:** push the Nix build to Cachix, and merge with the App token ([#20](https://github.com/protoc-contrib/protoc-gen-rust-defaults/issues/20)) ([60d321c](https://github.com/protoc-contrib/protoc-gen-rust-defaults/commit/60d321c31c0c4a5159f572edc9a02808c60270f0))
+
 ## [0.3.0](https://github.com/protoc-contrib/protoc-gen-rust-defaults/compare/v0.2.0...v0.3.0) (2026-10-11)
 
 
