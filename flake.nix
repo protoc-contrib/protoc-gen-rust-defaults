@@ -1,6 +1,11 @@
 {
   description = "protoc-gen-rust-defaults - A protoc plugin that emits set_defaults() for buffa messages from protoc.contrib.defaults annotations";
 
+  nixConfig = {
+    extra-substituters = [ "https://ralch.cachix.org" ];
+    extra-trusted-public-keys = [ "ralch.cachix.org-1:ti5RSqCJwd+VIv7dlxJEAVD98KIJDLxj1yJY+S80Q3A=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
